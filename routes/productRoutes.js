@@ -8,7 +8,7 @@ const {
 } = require("../controllers/productController");
 
 router.route("/:categoryId").post(userAuth,addProductToCategory);
-router.route("/:categoryId").get(userAuth,getProductsByCategory);
+router.route("/:categoryId").get(getProductsByCategory);
 router.route("/update").post(userAuth, updateProduct);
 router.route("/").delete(userAuth, deleteProduct);
 
