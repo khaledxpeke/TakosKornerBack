@@ -23,7 +23,8 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find().populate("products");
+    const categories = await Category.find()
+      .populate("products");
     res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,10 +52,12 @@ exports.updateCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
-    
+
     if (category.createdBy !== userId) {
-        return res.status(403).json({ message: "You do not have permission to update this product" });
-      }
+      return res
+        .status(403)
+        .json({ message: "You do not have permission to update this product" });
+    }
     category.name = req.body.name || category.name;
     category.image = req.body.image || category.image;
     category.products = req.body.products || category.products;
@@ -66,10 +69,13 @@ exports.updateCategory = async (req, res) => {
 };
 
 exports.deleteCategory = async (req, res) => {
-    const userId = req.user.id;
-    const categoryId = req.params.categoryId;
+  const userId = req.user.id;
+  const categoryId = req.params.categoryId;
   try {
-    const category = await Category.findByIdAndDelete({ _id: categoryId, createdBy: userId });
+    const category = await Category.findByIdAndDelete({
+      _id: categoryId,
+      createdBy: userId,
+    });
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }

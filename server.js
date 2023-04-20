@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const desertRoutes = require("./routes/desertRoutes");
+const supplementRoutes = require("./routes/supplementRoutes");
 const { userAuth } = require("./middleware/auth");
 
 app.use(
@@ -27,10 +28,12 @@ app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/product", require("./routes/productRoutes"));
 app.use("/api/category", require("./routes/categoryRoutes"));
 app.use("/api/desert", require("./routes/desertRoutes"));
+app.use("/api/supplement", require("./routes/supplementRoutes"));
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(categoryRoutes);
 app.use(desertRoutes);
+app.use(supplementRoutes);
 app.get(userAuth, (req, res) => res.send("User Route"));
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" });
