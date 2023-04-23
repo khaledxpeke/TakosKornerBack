@@ -22,7 +22,7 @@ exports.addIngrediant = async (req, res, next) => {
       name,
       image,
       product: productId,
-      type:typeId,
+      type: typeId,
       createdBy: userId,
     });
     await ingrediant.save();
@@ -40,7 +40,7 @@ exports.addIngrediant = async (req, res, next) => {
 exports.getIngrediantByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const ingrediants = await Ingrediant.find({ product: productId });
+    const ingrediants = await Ingrediant.find({ product: productId }).populate("type");
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({
@@ -57,7 +57,7 @@ exports.getIngredientsByType = async (req, res, next) => {
     const ingrediants = await Ingrediant.find({
       product: productId,
       type: typeId,
-    });
+    }).populate("type");
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(500).json({
@@ -126,4 +126,3 @@ exports.deleteIngredient = async (req, res, next) => {
     });
   }
 };
-
