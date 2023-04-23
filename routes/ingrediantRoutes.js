@@ -3,11 +3,13 @@ const { userAuth } = require("../middleware/auth");
 const {
   addIngrediant,
   getIngredientsByType,
-  updateIngrediant
+  updateIngrediant,
+  getIngrediantByProduct
 } = require("../controllers/ingrediantController");
 
 router.route("/:productId").post(userAuth, addIngrediant);
 router.route("/:productId/ingrediants/:typeId").get(getIngredientsByType);
+router.route("/prod/:productId").get(getIngrediantByProduct);
 router.route("/:id").post(userAuth, updateIngrediant);
 
 

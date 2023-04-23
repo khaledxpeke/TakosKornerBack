@@ -25,7 +25,11 @@ const ProductSchema = new Mongoose.Schema({
   },
   supplements: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Supplement" }],
   ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
-
+  type : [{
+    type: Mongoose.Schema.Types.ObjectId,
+    ref: "Type",
+    required: true,
+  }],
   createdBy: {
     type: Mongoose.Schema.Types.ObjectId,
     ref: "User",
