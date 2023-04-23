@@ -8,6 +8,9 @@ const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const desertRoutes = require("./routes/desertRoutes");
 const supplementRoutes = require("./routes/supplementRoutes");
+const ingrediantRoutes = require("./routes/ingrediantRoutes");
+const typeRoutes = require("./routes/typeRoutes");
+const packRoutes = require("./routes/packRoutes");
 const { userAuth } = require("./middleware/auth");
 
 app.use(
@@ -29,11 +32,17 @@ app.use("/api/product", require("./routes/productRoutes"));
 app.use("/api/category", require("./routes/categoryRoutes"));
 app.use("/api/desert", require("./routes/desertRoutes"));
 app.use("/api/supplement", require("./routes/supplementRoutes"));
+app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
+app.use("/api/type", require("./routes/typeRoutes"));
+app.use("/api/pack", require("./routes/packRoutes"));
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(categoryRoutes);
 app.use(desertRoutes);
 app.use(supplementRoutes);
+app.use(ingrediantRoutes);
+app.use(typeRoutes);
+app.use(packRoutes);
 app.get(userAuth, (req, res) => res.send("User Route"));
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" });
