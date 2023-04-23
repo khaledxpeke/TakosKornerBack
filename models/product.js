@@ -17,13 +17,15 @@ const ProductSchema = new Mongoose.Schema({
   },
   currency: {
     type: String,
-    },
+  },
   category: {
     type: Mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
   supplements: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Supplement" }],
+  ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
+
   createdBy: {
     type: Mongoose.Schema.Types.ObjectId,
     ref: "User",
