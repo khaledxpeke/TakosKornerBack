@@ -27,6 +27,9 @@ exports.addIngrediant = async (req, res, next) => {
     });
     await ingrediant.save();
     product.ingrediants.push(ingrediant);
+    if (!product.type.includes(typeId)) {
+      product.type.push(typeId);
+    }
     await product.save();
     res.status(201).json(ingrediant);
   } catch (error) {
@@ -40,7 +43,9 @@ exports.addIngrediant = async (req, res, next) => {
 exports.getIngrediantByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const ingrediants = await Ingrediant.find({ product: productId }).populate("type");
+    const ingrediants = await Ingrediant.find({ product: productId }).populate(
+      "type"
+    );
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({

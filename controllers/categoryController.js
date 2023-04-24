@@ -23,8 +23,14 @@ exports.createCategory = async (req, res) => {
 
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find()
-      .populate("products");
+    const categories = await Category.find().populate({
+      path: "products",
+      populate: [
+        { path: "ingrediants", select: "name image", populate: { path: "type",select :"name" } },
+        { path: "supplements" },
+        { path: "type" ,select :"name"},
+      ],
+    });
     res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({ message: error.message });
