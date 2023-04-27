@@ -36,7 +36,7 @@ app.use("/api/supplement", require("./routes/supplementRoutes"));
 app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
 app.use("/api/type", require("./routes/typeRoutes"));
 app.use("/api/pack", require("./routes/packRoutes"));
-app.use('/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads'));
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(categoryRoutes);
