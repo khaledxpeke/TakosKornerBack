@@ -10,7 +10,6 @@ const packSchema = mongoose.Schema({
     type: String,
     default:
       "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    required: true,
   },
   price: {
     type: Number,

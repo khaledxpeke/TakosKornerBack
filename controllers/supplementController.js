@@ -1,4 +1,6 @@
 const Supplement = require("../models/supplement");
+const Product = require("../models/product");
+const ProductSupplement = require("../models/ProductSupplement");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -10,7 +12,6 @@ const multerStorage = require("../middleware/multerStorage");
 
 const upload = multer({ storage: multerStorage });
 exports.addSupplement = async (req, res, next) => {
-  
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
@@ -18,7 +19,7 @@ exports.addSupplement = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, price, currency, product } = req.body;
+    const { name, price, currency } = req.body;
     const userId = req.user.id;
     const image = req.file.path;
     try {
@@ -27,7 +28,6 @@ exports.addSupplement = async (req, res, next) => {
         price,
         image,
         currency,
-        product,
         createdBy: userId,
       });
       res.status(201).json({
@@ -41,7 +41,36 @@ exports.addSupplement = async (req, res, next) => {
     }
   });
 };
+// exports.getSupplementsByProduct = async (req, res, next) => {
+//   try {
+//     const productId = req.params.productId;
+//     const product = await Product.findById(productId);
 
+//     if (!product) {
+//       return res.status(404).json({
+//         message: "Product not found",
+//       });
+//     }
+
+//     const productSupplements = await ProductSupplement.find({
+//       product: productId,
+//     });
+//     const supplementIds = productSupplements.map((ps) => ps.supplement);
+
+//     const supplements = await Supplement.find({
+//       _id: { $in: supplementIds },
+//     });
+
+//     res.status(200).json({
+//       supplements,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Failed to get supplements by product",
+//       error: error.message,
+//     });
+//   }
+// };
 exports.getSupplementByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {

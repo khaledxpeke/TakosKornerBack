@@ -20,7 +20,7 @@ exports.addPack = async (req, res, next) => {
     }
     const { name, price, currency } = req.body;
     const userId = req.user.id;
-    const image = req.file.path;
+    const image = req.file?.path || "";
     try {
       const pack = await Pack.create({
         name,
