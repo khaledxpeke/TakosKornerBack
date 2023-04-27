@@ -5,26 +5,39 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
 
+const upload = multer({ storage: multerStorage });
 exports.addPack = async (req, res, next) => {
-  const { name, image, price ,currency } = req.body;
-  const userId = req.user.id;
-  try {
-    const pack = await Pack.create({
-      name,
-      image,
-      price,
-      currency,
-      createdBy: userId,
-    });
-    await pack.save();
-    res.status(201).json(pack);
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+    const { name, price, currency } = req.body;
+    const userId = req.user.id;
+    const image = req.file.path;
+    try {
+      const pack = await Pack.create({
+        name,
+        image,
+        price,
+        currency,
+        createdBy: userId,
+      });
+      await pack.save();
+      res.status(201).json(pack);
+    } catch (error) {
+      res.status(400).json({
+        message: "Some error occured",
+        error: error.message,
+      });
+    }
+  });
 };
 
 exports.getPacks = async (req, res, next) => {

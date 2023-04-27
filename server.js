@@ -21,6 +21,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 connectDB();
 server = app.listen(3000, function () {
   console.log("Server is listening on port 3000");
@@ -35,6 +36,7 @@ app.use("/api/supplement", require("./routes/supplementRoutes"));
 app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
 app.use("/api/type", require("./routes/typeRoutes"));
 app.use("/api/pack", require("./routes/packRoutes"));
+app.use('/uploads', express.static('uploads'));
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(categoryRoutes);

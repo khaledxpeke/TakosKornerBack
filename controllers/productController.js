@@ -5,50 +5,70 @@ const app = express();
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
 app.use(express.json());
+// Set up multer upload middleware with the imported storage configuration
+const upload = multer({ storage: multerStorage });
 
 exports.addProductToCategory = async (req, res, next) => {
   const { categoryId } = req.params;
-  const { name, price, image, currency, supplements } = req.body;
+  const { currency, type,supplements } = req.body;
   const userId = req.user.id;
+  const price = Number(req.body.price ?? "");
 
-  try {
-    let product = await Product.findOne({ name });
-
-    if (product) {
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
       return res.status(400).json({
-        message: "Product already exists",
-      });
-    } else {
-      const product = new Product({
-        name,
-        price,
-        image,
-        category: categoryId,
-        currency,
-        supplements,
-        createdBy: userId,
-      });
-
-      const savedProduct = await product.save();
-
-      const updatedCategory = await Category.findByIdAndUpdate(
-        categoryId,
-        { $push: { products: savedProduct._id } },
-        { new: true }
-      );
-
-      res.status(201).json({
-        product: savedProduct,
-        category: updatedCategory,
+        message: "Image upload failed",
+        error: err.message,
       });
     }
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+
+    const name = req.body.name.replace(/"/g, "");
+    const image = req.file.path; // Get the image file path from the request
+
+    try {
+      let product = await Product.findOne({ name });
+
+      if (product) {
+        return res.status(400).json({
+          message: "Product already exists",
+        });
+      } else {
+        console.log(req.body.supplements.split(','))
+        console.log(req.body.type)
+        const product = new Product({
+          name,
+          price,
+          image,
+          category: categoryId,
+          currency,
+          supplements: req.body.supplements.split(","),
+          type: req.body.type.split(","),
+          createdBy: userId,
+        });
+
+        const savedProduct = await product.save();
+
+        const updatedCategory = await Category.findByIdAndUpdate(
+          categoryId,
+          { $push: { products: savedProduct._id } },
+          { new: true }
+        );
+
+        res.status(201).json({
+          product: savedProduct,
+          category: updatedCategory,
+        });
+      }
+    } catch (error) {
+      res.status(400).json({
+        message: "Some error occured",
+        error: error.message,
+      });
+    }
+  });
 };
 
 exports.getProductsByCategory = async (req, res, next) => {

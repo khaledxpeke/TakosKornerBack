@@ -7,7 +7,7 @@ const {
   getIngrediantByProduct
 } = require("../controllers/ingrediantController");
 
-router.route("/:productId").post(userAuth, addIngrediant);
+router.route("/").post(userAuth, addIngrediant);
 router.route("/:productId/ingrediants/:typeId").get(getIngredientsByType);
 router.route("/prod/:productId").get(getIngrediantByProduct);
 router.route("/:id").post(userAuth, updateIngrediant);
