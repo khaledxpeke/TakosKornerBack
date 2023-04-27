@@ -3,22 +3,34 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
 
+const upload = multer({ storage: multerStorage });
 exports.createCategory = async (req, res) => {
-  const userId = req.user.id;
-  const category = new Category({
-    createdBy: userId,
-    name: req.body.name,
-    image: req.body.image,
-    products: req.body.products,
-  });
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+    const userId = req.user.id;
+    const image = req.file.path;
+    const category = new Category({
+      createdBy: userId,
+      name: req.body.name,
+      image: image,
+      products: req.body.products,
+    });
 
-  try {
-    const newCategory = await category.save();
-    res.status(201).json(newCategory);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+    try {
+      const newCategory = await category.save();
+      res.status(201).json(newCategory);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
 };
 
 exports.getAllCategories = async (req, res) => {
@@ -26,9 +38,13 @@ exports.getAllCategories = async (req, res) => {
     const categories = await Category.find().populate({
       path: "products",
       populate: [
-        { path: "ingrediants", select: "name image", populate: { path: "type",select :"name" } },
+        {
+          path: "ingrediants",
+          select: "name image",
+          populate: { path: "type", select: "name" },
+        },
         { path: "supplements" },
-        { path: "type" ,select :"name"},
+        { path: "type", select: "name" },
       ],
     });
     res.status(200).json(categories);

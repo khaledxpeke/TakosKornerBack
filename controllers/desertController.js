@@ -5,32 +5,42 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
 
+const upload = multer({ storage: multerStorage });
 exports.addDesert = async (req, res, next) => {
-  const { name, price, image } = req.body;
-  try {
-    const deserts = await Desert.create({
-      name,
-      price,
-      image,
-    });
-    res.status(201).json({
-      deserts,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+    const { name, price } = req.body;
+    const image = req.file.path;
+    try {
+      const deserts = await Desert.create({
+        name,
+        price,
+        image,
+      });
+      res.status(201).json({
+        deserts,
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: "Some error occured",
+        error: error.message,
+      });
+    }
+  });
 };
 
 exports.getAllDeserts = async (req, res, next) => {
   try {
     const deserts = await Desert.find();
-    res.status(200).json(
-      deserts,
-    );
+    res.status(200).json(deserts);
   } catch (error) {
     res.status(400).json({
       message: "No deserts found",

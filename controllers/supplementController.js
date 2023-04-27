@@ -5,28 +5,41 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
 
+const upload = multer({ storage: multerStorage });
 exports.addSupplement = async (req, res, next) => {
-  const { name, price, image, currency, product } = req.body;
-  const userId = req.user.id;
-  try {
-    const supplements = await Supplement.create({
-      name,
-      price,
-      image,
-      currency,
-      product,
-      createdBy: userId,
-    });
-    res.status(201).json({
-      supplements,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+  
+  upload.single("image")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+    const { name, price, currency, product } = req.body;
+    const userId = req.user.id;
+    const image = req.file.path;
+    try {
+      const supplements = await Supplement.create({
+        name,
+        price,
+        image,
+        currency,
+        product,
+        createdBy: userId,
+      });
+      res.status(201).json({
+        supplements,
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: "Some error occured",
+        error: error.message,
+      });
+    }
+  });
 };
 
 exports.getSupplementByProduct = async (req, res, next) => {

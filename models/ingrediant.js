@@ -12,11 +12,12 @@ const ingrediantSchema = mongoose.Schema({
       "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
     required: true,
   },
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
-  },
+  product: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+  ],
   type: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Type",
