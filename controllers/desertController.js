@@ -17,13 +17,14 @@ exports.addDesert = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, price } = req.body;
+    const { name, price,currency } = req.body;
     const image = req.file.path;
     try {
       const deserts = await Desert.create({
         name,
         price,
         image,
+        currency,
       });
       res.status(201).json({
         deserts,

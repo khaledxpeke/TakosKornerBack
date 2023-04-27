@@ -18,8 +18,8 @@ exports.addIngrediant = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, typeId, productId } = req.body;
-    const productIds = productId?.split(",") || [];
+    const { name, typeId, product } = req.body;
+    const productIds = product?.split(",") || [];
     const userId = req.user.id;
     const image = req.file.path;
     try {

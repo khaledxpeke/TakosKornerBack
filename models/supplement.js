@@ -23,7 +23,6 @@ const supplementSchema = mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-    required: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

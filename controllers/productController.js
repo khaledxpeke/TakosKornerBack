@@ -12,11 +12,6 @@ app.use(express.json());
 const upload = multer({ storage: multerStorage });
 
 exports.addProductToCategory = async (req, res, next) => {
-  const { categoryId } = req.params;
-  const { currency, type,supplements } = req.body;
-  const userId = req.user.id;
-  const price = Number(req.body.price ?? "");
-
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
@@ -24,10 +19,13 @@ exports.addProductToCategory = async (req, res, next) => {
         error: err.message,
       });
     }
-
+    const { categoryId } = req.params;
+    const userId = req.user.id;
+    const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-
+    const { currency,type } = req.body;
+    const typeIds = type?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
 
@@ -36,19 +34,19 @@ exports.addProductToCategory = async (req, res, next) => {
           message: "Product already exists",
         });
       } else {
-        console.log(req.body.supplements.split(','))
-        console.log(req.body.type)
+
         const product = new Product({
           name,
           price,
-          image,
           category: categoryId,
           currency,
-          supplements: req.body.supplements.split(","),
-          type: req.body.type.split(","),
+          type: typeIds,
           createdBy: userId,
         });
-
+        if (image) {
+          product.image = image;
+          await product.save();
+        }
         const savedProduct = await product.save();
 
         const updatedCategory = await Category.findByIdAndUpdate(
