@@ -41,48 +41,48 @@ exports.addSupplement = async (req, res, next) => {
     }
   });
 };
-exports.getSupplementsByProduct = async (req, res, next) => {
-  try {
-    const productId = req.params.productId;
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
-    }
-
-    const productSupplements = await ProductSupplement.find({
-      product: productId,
-    });
-    const supplementIds = productSupplements.map((ps) => ps.supplement);
-
-    const supplements = await Supplement.find({
-      _id: { $in: supplementIds },
-    });
-
-    res.status(200).json({
-      supplements,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to get supplements by product",
-      error: error.message,
-    });
-  }
-};
-// exports.getSupplementByProduct = async (req, res, next) => {
-//   const { productId } = req.params;
+// exports.getSupplementsByProduct = async (req, res, next) => {
 //   try {
-//     const supplements = await Supplement.find({ product: productId });
-//     res.status(200).json(supplements);
+//     const productId = req.params.productId;
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json({
+//         message: "Product not found",
+//       });
+//     }
+
+//     const productSupplements = await ProductSupplement.find({
+//       product: productId,
+//     });
+//     const supplementIds = productSupplements.map((ps) => ps.supplement);
+
+//     const supplements = await Supplement.find({
+//       _id: { $in: supplementIds },
+//     });
+
+//     res.status(200).json({
+//       supplements,
+//     });
 //   } catch (error) {
-//     res.status(400).json({
-//       message: "No supplements found",
+//     res.status(500).json({
+//       message: "Failed to get supplements by product",
 //       error: error.message,
 //     });
 //   }
 // };
+exports.getSupplementByProduct = async (req, res, next) => {
+  const { productId } = req.params;
+  try {
+    const supplements = await Supplement.find({ product: productId });
+    res.status(200).json(supplements);
+  } catch (error) {
+    res.status(400).json({
+      message: "No supplements found",
+      error: error.message,
+    });
+  }
+};
 
 exports.getAllSupplements = async (req, res, next) => {
   try {
