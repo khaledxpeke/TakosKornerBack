@@ -40,3 +40,42 @@ exports.getAllTypes = async (req, res, next) => {
   }
 };
 
+exports.getTypeById = async (req, res, next) => {
+  try {
+    const { typeId } = req.params;
+    const type = await Type.findById(typeId);
+    res.status(200).json(type);
+  } catch (error) {
+    res.status(400).json({
+      message: "No type found",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateType = async (req, res, next) => {
+  try {
+    const { typeId } = req.params;
+    const { name } = req.body;
+    const type = await Type.findByIdAndUpdate(typeId, { name }, { new: true });
+    res.status(200).json(type);
+  } catch (error) {
+    res.status(400).json({
+      message: "No type found",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteType = async (req, res, next) => {
+  try {
+    const { typeId } = req.params;
+    await Type.findByIdAndDelete(typeId);
+    res.status(200).json({ message: "Type deleted successfully" });
+  } catch (error) {
+    res.status(400).json({
+      message: "No type found",
+      error: error.message,
+    });
+  }
+};
