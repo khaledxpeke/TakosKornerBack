@@ -14,6 +14,6 @@ router.route("/add/:productId").post(userAuth, addSupplementToProduct);
 router.route("/").get(getAllSupplements);
 router.route("/:supplementId").get(getSupplementById);
 router.route("/product/:productId").get(getSupplementByProduct);
-router.route("/").delete(userAuth, deleteSupplement);
+router.route("/:supplementId").delete(userAuth, deleteSupplement);
 
 module.exports = router;

@@ -10,7 +10,53 @@ const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 
 const upload = multer({ storage: multerStorage });
-exports.addIngrediant = async (req, res, next) => {
+// exports.addIngrediant = async (req, res, next) => {
+//   upload.single("image")(req, res, async (err) => {
+//     if (err) {
+//       return res.status(400).json({
+//         message: "Image upload failed",
+//         error: err.message,
+//       });
+//     }
+//     const { name, typeId, product } = req.body;
+//     const productIds = product?.split(",") || [];
+//     const userId = req.user.id;
+//     const image = req.file.path;
+//     try {
+//       const ingrediant = await Ingrediant.create({
+//         name,
+//         image,
+//         type: typeId,
+//         product: productIds,
+//         createdBy: userId,
+//       });
+//       await ingrediant.save();
+//       for (let i = 0; i < productIds.length; i++) {
+//         const productId = productIds[i];
+//         const product = await Product.findById(productId);
+//         if (!product) {
+//           return res.status(404).json({
+//             message: `Product not found with ID: ${productId}`,
+//           });
+//         }
+//         product.ingrediants.push(ingrediant);
+//         if (!product.type.includes(typeId)) {
+//           product.type.push(typeId);
+//         }
+//         await product.save();
+//       }
+
+//       res.status(201).json(ingrediant);
+//     } catch (error) {
+//       res.status(400).json({
+//         message: "Some error occured",
+//         error: error.message,
+//       });
+//     }
+//   });
+// };
+
+exports.createIngredient = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
@@ -18,35 +64,18 @@ exports.addIngrediant = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, typeId, product } = req.body;
-    const productIds = product?.split(",") || [];
+    const { name, typeId } = req.body;
     const userId = req.user.id;
     const image = req.file.path;
     try {
-      const ingrediant = await Ingrediant.create({
+      const ingredient = await Ingrediant.create({
         name,
         image,
         type: typeId,
-        product: productIds,
         createdBy: userId,
       });
-      await ingrediant.save();
-      for (let i = 0; i < productIds.length; i++) {
-        const productId = productIds[i];
-        const product = await Product.findById(productId);
-        if (!product) {
-          return res.status(404).json({
-            message: `Product not found with ID: ${productId}`,
-          });
-        }
-        product.ingrediants.push(ingrediant);
-        if (!product.type.includes(typeId)) {
-          product.type.push(typeId);
-        }
-        await product.save();
-      }
-
-      res.status(201).json(ingrediant);
+      await ingredient.save();
+      res.status(201).json(ingredient);
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",
@@ -56,6 +85,49 @@ exports.addIngrediant = async (req, res, next) => {
   });
 };
 
+exports.addIngrediantToProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    const { ingrediantId } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        message: `Product not found with ID: ${productId}`,
+      });
+    }
+
+    const ingrediant = await Ingrediant.findById(ingrediantId);
+    if (!ingrediant) {
+      return res.status(404).json({
+        message: `Ingrediant not found with ID: ${ingrediantId}`,
+      });
+    }
+
+    // Check if the ingrediant already exists in the product
+    const ingrediantIndex = product.ingrediants.findIndex(
+      (ingrediant) => ingrediant.toString() === ingrediantId
+    );
+    if (ingrediantIndex !== -1) {
+      return res.status(409).json({
+        message: `Ingrediant with ID ${ingrediantId} already exists in the product`,
+      });
+    }
+
+    product.ingrediants.push(ingrediant);
+    if (!product.type.includes(ingrediant.type)) {
+      product.type.push(ingrediant.type);
+    }
+    await product.save();
+    ingrediant.product.push(productId);
+    await ingrediant.save();
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({
+      message: "Some error occurred while adding ingrediant to product",
+      error: error.message,
+    });
+  }
+};
 exports.getIngrediantByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
@@ -129,7 +201,7 @@ exports.deleteIngredient = async (req, res, next) => {
       });
     }
 
-    await Ingrediant.deleteOne({ _id: ingrediant });
+    await Ingrediant.deleteOne({ _id: ingrediant._id });
 
     // Remove the ingredient from the product's ingredients array
     await Product.findByIdAndUpdate(ingrediant.product, {

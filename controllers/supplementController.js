@@ -123,17 +123,30 @@ exports.getSupplementById = async (req, res, next) => {
 };
 
 exports.deleteSupplement = async (req, res, next) => {
+  const { supplementId } = req.params;
   try {
-    const { supplementId } = req.params;
-    const userId = req.user.id;
-    const supplements = await Supplement.findByIdAndDelete(supplementId);
+    const supplements = await Supplement.findById(supplementId);
+
+    if (!supplements) {
+      return res.status(404).json({
+        message: "Supplement not found",
+      });
+    }
+
+    await Supplement.deleteOne({ _id: supplements._id });
+
+    // Remove the ingredient from the product's ingredients array
+    await Product.findByIdAndUpdate(supplements.product, {
+      $pull: { supplements: supplementId },
+    });
+
     res.status(200).json({
+      message: "Supplement deleted successfully",
       supplements,
-      createdBy: userId,
     });
   } catch (error) {
-    res.status(400).json({
-      message: "No supplement found",
+    res.status(500).json({
+      message: "Some error occurred",
       error: error.message,
     });
   }

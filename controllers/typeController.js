@@ -27,3 +27,16 @@ exports.createType = async (req, res, next) => {
       .json({ message: "Some error occurred", error: error.message });
   }
 };
+
+exports.getAllTypes = async (req, res, next) => {
+  try {
+    const types = await Type.find();
+    res.status(200).json(types);
+  } catch (error) {
+    res.status(400).json({
+      message: "No types found",
+      error: error.message,
+    });
+  }
+};
+
