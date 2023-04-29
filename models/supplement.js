@@ -20,10 +20,10 @@ const supplementSchema = mongoose.Schema({
       "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
     required: true,
   },
-  product: {
+  products: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-  },
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

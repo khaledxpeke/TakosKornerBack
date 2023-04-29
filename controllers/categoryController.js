@@ -43,7 +43,7 @@ exports.getAllCategories = async (req, res) => {
           select: "name image",
           populate: { path: "type", select: "name" },
         },
-        { path: "supplements" },
+        { path: "supplements", select: "name image price currency" },
         { path: "type", select: "name" },
       ],
     });

@@ -1,14 +1,16 @@
 const router = require("express").Router();
 const { userAuth } = require("../middleware/auth");
 const {
-  addSupplement,
+  createSupplement,
   getAllSupplements,
   getSupplementById,
   getSupplementByProduct,
+  addSupplementToProduct,
   deleteSupplement,
 } = require("../controllers/supplementController");
 
-router.route("/").post(userAuth, addSupplement);
+router.route("/").post(userAuth, createSupplement);
+router.route("/add/:productId").post(userAuth, addSupplementToProduct);
 router.route("/").get(getAllSupplements);
 router.route("/:supplementId").get(getSupplementById);
 router.route("/product/:productId").get(getSupplementByProduct);

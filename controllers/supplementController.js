@@ -11,7 +11,7 @@ const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 
 const upload = multer({ storage: multerStorage });
-exports.addSupplement = async (req, res, next) => {
+exports.createSupplement = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
@@ -41,40 +41,51 @@ exports.addSupplement = async (req, res, next) => {
     }
   });
 };
-// exports.getSupplementsByProduct = async (req, res, next) => {
-//   try {
-//     const productId = req.params.productId;
-//     const product = await Product.findById(productId);
+exports.addSupplementToProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    const { supplementId } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        message: `Product not found with ID: ${productId}`,
+      });
+    }
 
-//     if (!product) {
-//       return res.status(404).json({
-//         message: "Product not found",
-//       });
-//     }
+    const supplement = await Supplement.findById(supplementId);
+    if (!supplement) {
+      return res.status(404).json({
+        message: `Supplement not found with ID: ${supplementId}`,
+      });
+    }
 
-//     const productSupplements = await ProductSupplement.find({
-//       product: productId,
-//     });
-//     const supplementIds = productSupplements.map((ps) => ps.supplement);
+    if (product.supplements.includes(supplementId)) {
+      return res.status(409).json({
+        message: `Supplement with ID ${supplementId} already exists in the product`,
+      });
+    }
 
-//     const supplements = await Supplement.find({
-//       _id: { $in: supplementIds },
-//     });
+    // Add the product ID to the supplement's "products" array
+    supplement.products.push(productId);
+    await supplement.save();
 
-//     res.status(200).json({
-//       supplements,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Failed to get supplements by product",
-//       error: error.message,
-//     });
-//   }
-// };
+    // Add the supplement ID to the product's "supplements" array
+    product.supplements.push(supplementId);
+    await product.save();
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({
+      message: "Some error occurred while adding supplement to product",
+      error: error.message,
+    });
+  }
+};
+
 exports.getSupplementByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const supplements = await Supplement.find({ product: productId });
+    const supplements = await Supplement.find({ products: productId });
     res.status(200).json(supplements);
   } catch (error) {
     res.status(400).json({
