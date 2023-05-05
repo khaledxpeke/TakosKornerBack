@@ -1,4 +1,5 @@
 const History = require("../models/History");
+const Product = require("../models/product");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -6,110 +7,28 @@ require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
-exports.addHistory = async (req, res, next) => {
-  const {
-    categoryIds,
-    productIds,
-    ingrediantIds,
-    supplementIds,
-    desertIds,
-    pack,
-  } = req.body;
-  try {
-    const historyData = {
-      category: categoryIds,
-      product: productIds,
-      ingrediant: ingrediantIds,
-      supplement: supplementIds,
-      desert: desertIds,
-      pack: pack,
-    };
-    const history = await History.create(historyData);
+exports.addHistory = async (req, res) => {
+  const { plat, addons, pack, total } = req.body;
 
-    res.status(201).json({
-        history,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occurred",
-      error: error.message,
-    });
-  }
-};
-
-exports.getAllHistory = async (req, res, next) => {
   try {
-    const history = await History.find().populate([
-      "category",
-      "product",
-      "ingrediant",
-      "supplement",
-      "desert",
-      "pack",
-    ]);
-    res.status(200).json(history);
-  } catch (error) {
-    res.status(400).json({
-      message: "No history found",
-      error: error.message,
-    });
-  }
-};
+    const product = await Product.findById(plat);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
 
-exports.getHistoryById = async (req, res, next) => {
-  try {
-    const { historyId } = req.params;
-    const history = await History.findById(historyId).populate([
-      "category",
-      "product",
-      "ingredient",
-      "supplement",
-      "desert",
-      "pack",
-    ]);
-    res.status(200).json({
-      history,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "No history found",
-      error: error.message,
-    });
-  }
-};
-
-exports.deleteHistory = async (req, res, next) => {
-  try {
-    const { historyId } = req.params;
-    const history = await History.findByIdAndDelete(historyId);
-    res.status(200).json({
-      message: "History successfully deleted",
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "No history found to be deleted",
-      error: error.message,
-    });
-  }
-};
-
-exports.updateHistory = async (req, res, next) => {
-  const { historyId } = req.params;
-  const { category, product, ingredient, supplement, desert, pack } = req.body;
-  try {
-    const history = await History.findByIdAndUpdate(historyId, {
-      category,
-      product,
-      ingredient,
-      supplement,
-      desert,
+    const newHistory = new History({
+      plat,
+      addons,
       pack,
+      total,
     });
-    res.status(200).json({ history, message: "History successfully updated" });
+
+    const savedHistory = await newHistory.save();
+    res
+      .status(201)
+      .json({ message: "History saved successfully", savedHistory });
   } catch (error) {
-    res.status(400).json({
-      message: "No history found",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ error: "Error saving history" });
   }
 };
