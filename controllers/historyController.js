@@ -7,28 +7,31 @@ require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
-exports.addHistory = async (req, res) => {
-  const { plat, addons, pack, total } = req.body;
+exports.addHistory = (req, res) => {
+  const { products, pack, total } = req.body;
 
-  try {
-    const product = await Product.findById(plat);
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
+  // Create a new history object with the provided products, pack, and total
+  const history = new History({
+    product: products.map((product) => ({
+      plat: product.plat,
+      addons: product.addons,
+    })),
+    pack,
+    total,
+  });
 
-    const newHistory = new History({
-      plat,
-      addons,
-      pack,
-      total,
+  // Save the new history object to the database
+  history
+    .save()
+    .then((result) => {
+      res.status(201).json(
+        result,
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: err,
+      });
     });
-
-    const savedHistory = await newHistory.save();
-    res
-      .status(201)
-      .json({ message: "History saved successfully", savedHistory });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error saving history" });
-  }
 };

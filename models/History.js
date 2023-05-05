@@ -1,18 +1,22 @@
 const mongoose = require("mongoose");
 
 const historySchema = mongoose.Schema({
-  plat: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
-  },
-  addons: [
+  product: [
     {
-      _id: { type: String, required: true },
-      name: { type: String, required: true },
-      currency: { type: String },
-      price: { type: Number },
-      image: { type: String },
+      plat: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      addons: [
+        {
+          _id: { type: String, required: true },
+          name: { type: String, required: true },
+          currency: { type: String },
+          price: { type: Number },
+          image: { type: String },
+        },
+      ],
     },
   ],
   pack: {
