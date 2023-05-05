@@ -35,6 +35,10 @@ const ProductSchema = new Mongoose.Schema({
     ref: "User",
     required: true,
   },
+  maxMeat: {
+    type: Number,
+    default: 3,
+  },
 });
 
 const Product = Mongoose.model("Product", ProductSchema);

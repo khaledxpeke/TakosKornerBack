@@ -24,7 +24,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency,type } = req.body;
+    const { currency, type, maxMeat } = req.body;
     const typeIds = type?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
@@ -34,7 +34,6 @@ exports.addProductToCategory = async (req, res, next) => {
           message: "Product already exists",
         });
       } else {
-
         const product = new Product({
           name,
           price,
@@ -42,6 +41,7 @@ exports.addProductToCategory = async (req, res, next) => {
           currency,
           type: typeIds,
           createdBy: userId,
+          maxMeat,
         });
         if (image) {
           product.image = image;
@@ -112,7 +112,7 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const { name, price, image, currency, supplements } = req.body;
+  const { name, price, image, currency, supplements,maxMeat } = req.body;
   const userId = req.user.id;
 
   try {
@@ -133,6 +133,7 @@ exports.updateProduct = async (req, res, next) => {
     product.image = image;
     product.currency = currency;
     product.supplements = supplements;
+    product.maxMeat = maxMeat;
 
     const updatedProduct = await product.save();
 
