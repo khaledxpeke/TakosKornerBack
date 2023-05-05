@@ -13,7 +13,7 @@ exports.addHistory = async (req, res) => {
   try {
     const product = await Product.findById(plat);
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     const newHistory = new History({
@@ -24,11 +24,9 @@ exports.addHistory = async (req, res) => {
     });
 
     const savedHistory = await newHistory.save();
-    res
-      .status(201)
-      .json({ message: "History saved successfully", savedHistory });
+    res.status(201).json(savedHistory);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error saving history" });
+    res.status(500).json({ message: "Some error occured" });
   }
 };
