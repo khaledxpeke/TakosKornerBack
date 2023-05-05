@@ -1,39 +1,26 @@
 const mongoose = require("mongoose");
 
 const historySchema = mongoose.Schema({
-  category: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    required: true,
-  }],
-  product: [{
+  plat: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
     required: true,
-  }],
-  ingrediant: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Ingrediant",
-    required: true,
-  }],
-  supplement:[ {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Supplement",
-    required: true,
-  }],
-  desert: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Desert",
-    required: true,
-  }],
+  },
+  addons: [
+    {
+      _id: { type: String, required: true },
+      name: { type: String, required: true },
+      currency: { type: String },
+      price: { type: Number },
+      image: { type: String },
+    },
+  ],
   pack: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Pack",
+    type: String,
     required: true,
   },
-  date: {
-    type: Date,
-    default: Date.now(),
+  total: {
+    type: String,
     required: true,
   },
 });
