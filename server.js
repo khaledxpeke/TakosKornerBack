@@ -13,7 +13,7 @@ const typeRoutes = require("./routes/typeRoutes");
 const packRoutes = require("./routes/packRoutes");
 const historyRoutes = require("./routes/historyRoutes");
 const { userAuth } = require("./middleware/auth");
-
+app.timeout = 300000;
 app.use(
   cors({
     origin: "*",

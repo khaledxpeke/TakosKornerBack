@@ -41,11 +41,13 @@ exports.addProductToCategory = async (req, res, next) => {
           currency,
           type: typeIds,
           createdBy: userId,
-          maxMeat,
         });
         if (image) {
           product.image = image;
           await product.save();
+        }
+        if (typeIds.includes("meat")) {
+          product.maxMeat = maxMeat ; // set maxMeat to the value from the request body or default to 3
         }
         const savedProduct = await product.save();
 
