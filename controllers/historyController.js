@@ -18,14 +18,15 @@ exports.addHistory = async (req, res) => {
     pack,
     total,
   });
-
+  console.log('Before saving history:', history);
   history
     .save()
     .then((result) => {
+      console.log('History saved:', result);
       res.status(201).json(result);
     })
     .catch((err) => {
-      console.log(err);
+      console.log('Error occurred while saving history:', err);
       res.status(500).json({
         message: "Some error occured",
         error: err,
