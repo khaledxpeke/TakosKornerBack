@@ -10,51 +10,6 @@ const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 
 const upload = multer({ storage: multerStorage });
-// exports.addIngrediant = async (req, res, next) => {
-//   upload.single("image")(req, res, async (err) => {
-//     if (err) {
-//       return res.status(400).json({
-//         message: "Image upload failed",
-//         error: err.message,
-//       });
-//     }
-//     const { name, typeId, product } = req.body;
-//     const productIds = product?.split(",") || [];
-//     const userId = req.user.id;
-//     const image = req.file.path;
-//     try {
-//       const ingrediant = await Ingrediant.create({
-//         name,
-//         image,
-//         type: typeId,
-//         product: productIds,
-//         createdBy: userId,
-//       });
-//       await ingrediant.save();
-//       for (let i = 0; i < productIds.length; i++) {
-//         const productId = productIds[i];
-//         const product = await Product.findById(productId);
-//         if (!product) {
-//           return res.status(404).json({
-//             message: `Product not found with ID: ${productId}`,
-//           });
-//         }
-//         product.ingrediants.push(ingrediant);
-//         if (!product.type.includes(typeId)) {
-//           product.type.push(typeId);
-//         }
-//         await product.save();
-//       }
-
-//       res.status(201).json(ingrediant);
-//     } catch (error) {
-//       res.status(400).json({
-//         message: "Some error occured",
-//         error: error.message,
-//       });
-//     }
-//   });
-// };
 
 exports.createIngredient = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {

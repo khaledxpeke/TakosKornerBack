@@ -21,7 +21,6 @@ exports.createCategory = async (req, res) => {
       createdBy: userId,
       name: req.body.name,
       image: image,
-      products: req.body.products,
     });
 
     try {
