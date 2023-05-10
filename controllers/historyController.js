@@ -9,7 +9,6 @@ app.use(express.json());
 
 exports.addHistory = async (req, res) => {
   const { products, pack, total } = req.body;
-
   const history = await new History({
     product: products.map((product) => ({
       plat: product.plat,
