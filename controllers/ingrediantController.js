@@ -19,7 +19,7 @@ exports.createIngredient = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, typeId } = req.body;
+    const { name, typeId,maxIngrediant } = req.body;
     const userId = req.user.id;
     const image = req.file.path;
     try {
@@ -28,6 +28,7 @@ exports.createIngredient = async (req, res, next) => {
         image,
         type: typeId,
         createdBy: userId,
+        maxIngrediant,
       });
       await ingredient.save();
       res.status(201).json(ingredient);
@@ -117,7 +118,7 @@ exports.getIngredientsByType = async (req, res, next) => {
 
 exports.updateIngrediant = async (req, res, next) => {
   const { id } = req.params;
-  const { name, image, type } = req.body;
+  const { name, image, type ,maxIngrediant} = req.body;
 
   try {
     const ingrediant = await Ingrediant.findById(id);
@@ -130,6 +131,7 @@ exports.updateIngrediant = async (req, res, next) => {
     ingrediant.name = name || ingrediant.name;
     ingrediant.image = image || ingrediant.image;
     ingrediant.type = type || ingrediant.type;
+    ingrediant.maxIngrediant = maxIngrediant || ingrediant.maxIngrediant;
 
     await ingrediant.save();
 

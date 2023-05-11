@@ -24,7 +24,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, type, maxMeat } = req.body;
+    const { currency, type } = req.body;
     const typeIds = type?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
@@ -45,9 +45,6 @@ exports.addProductToCategory = async (req, res, next) => {
         if (image) {
           product.image = image;
           await product.save();
-        }
-        if (typeIds.includes("meat")) {
-          product.maxMeat = maxMeat ; // set maxMeat to the value from the request body or default to 3
         }
         const savedProduct = await product.save();
 
@@ -114,7 +111,7 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const { name, price, image, currency, supplements,maxMeat } = req.body;
+  const { name, price, image, currency, supplements } = req.body;
   const userId = req.user.id;
 
   try {
@@ -135,7 +132,6 @@ exports.updateProduct = async (req, res, next) => {
     product.image = image;
     product.currency = currency;
     product.supplements = supplements;
-    product.maxMeat = maxMeat;
 
     const updatedProduct = await product.save();
 

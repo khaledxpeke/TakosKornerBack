@@ -28,6 +28,9 @@ const ingrediantSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  maxIngrediant: {
+    type: Number,
+  },
 });
 
 module.exports = mongoose.model("Ingrediant", ingrediantSchema);
