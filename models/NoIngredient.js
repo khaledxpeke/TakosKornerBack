@@ -11,6 +11,15 @@ const NoIngredientSchema = mongoose.Schema({
         ref: "Product",
       },
     ],
+    type: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Type",
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
   });
   
   module.exports = mongoose.model("NoIngredient", NoIngredientSchema);
