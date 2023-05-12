@@ -35,6 +35,9 @@ const ProductSchema = new Mongoose.Schema({
     ref: "User",
     required: true,
   },
+  maxIngrediant: {
+    type: Number,
+  },
 });
 
 const Product = Mongoose.model("Product", ProductSchema);
