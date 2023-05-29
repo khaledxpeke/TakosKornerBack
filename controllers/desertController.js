@@ -40,6 +40,7 @@ exports.addDesert = async (req, res, next) => {
 
 exports.getAllDeserts = async (req, res, next) => {
   try {
+
     const deserts = await Desert.find();
     res.status(200).json(deserts);
   } catch (error) {

@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 connectDB();
 server = app.listen(3300, function () {
-  console.log("Server is listening on port 3000");
+  console.log("Server is listening on port 3300");
 });
 
 app.use(cookieParser());

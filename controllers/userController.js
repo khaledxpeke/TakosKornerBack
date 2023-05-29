@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
 exports.register = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password,fullName} = req.body;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(400).json({ message: "User already exists" });
@@ -22,6 +22,7 @@ exports.register = async (req, res, next) => {
       await User.create({
         email,
         password: hash,
+        fullName,
       })
         .then((user) => {
           const maxAge = 3 * 60 * 60;
