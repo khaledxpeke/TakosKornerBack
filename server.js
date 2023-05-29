@@ -30,7 +30,7 @@ server = app.listen(3300, function () {
 });
 
 app.use(cookieParser());
-app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/auth", require("./routes/userRoutes"));
 app.use("/api/product", require("./routes/productRoutes"));
 app.use("/api/category", require("./routes/categoryRoutes"));
 app.use("/api/desert", require("./routes/desertRoutes"));
