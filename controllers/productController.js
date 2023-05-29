@@ -85,6 +85,17 @@ exports.getProductsByCategory = async (req, res, next) => {
     });
   }
 };
+exports.getAllProducts = async (req, res, next) => {
+  try {
+    const products = await Product.find({});
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(400).json({
+      message: "Some error occured",
+      error: error.message,
+    });
+  }
+};
 
 exports.deleteProduct = async (req, res, next) => {
   const { productId } = req.params;
