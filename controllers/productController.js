@@ -24,7 +24,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, type ,maxIngrediant} = req.body;
+    const { currency, type, maxIngrediant } = req.body;
     const typeIds = type?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
@@ -58,6 +58,7 @@ exports.addProductToCategory = async (req, res, next) => {
         res.status(201).json({
           product: savedProduct,
           category: updatedCategory,
+          message: "Product added successfully",
         });
       }
     } catch (error) {
@@ -99,18 +100,14 @@ exports.getAllProducts = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const userId = req.user.id;
   try {
-    const product = await Product.findById({
+    const product = await Product.findByIdAndDelete({
       _id: productId,
-      createdBy: userId,
     });
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-
-    await product.remove();
 
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
@@ -123,20 +120,13 @@ exports.deleteProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const { name, price, image, currency, supplements,maxIngrediant } = req.body;
-  const userId = req.user.id;
+  const { name, price, image, currency, supplements, maxIngrediant } = req.body;
 
   try {
     const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
-    }
-
-    if (product.createdBy !== userId) {
-      return res
-        .status(403)
-        .json({ message: "You do not have permission to update this product" });
     }
 
     product.name = name;
