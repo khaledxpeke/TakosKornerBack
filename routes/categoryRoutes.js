@@ -12,6 +12,6 @@ router.route("/").post(userAuth, createCategory);
 router.route("/").get(getAllCategories);
 router.route("/:CategoryId").get(getCategoryById);
 router.route("/update").post(userAuth, updateCategory);
-router.route("/").delete(userAuth, deleteCategory);
+router.route("/:categoryId").delete(userAuth, deleteCategory);
 
 module.exports = router;
