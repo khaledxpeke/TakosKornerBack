@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const Category = require("../models/category");
+const Ingrediant = require("../models/ingrediant");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -26,6 +27,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const image = req.file.path; // Get the image file path from the request
     const { currency, type, maxIngrediant } = req.body;
     const typeIds = type?.split(",") || [];
+    const ingrediantIds = req.body.ingrediants?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
 
@@ -42,6 +44,7 @@ exports.addProductToCategory = async (req, res, next) => {
           type: typeIds,
           createdBy: userId,
           maxIngrediant,
+          ingrediants: ingrediantIds,
         });
         if (image) {
           product.image = image;
@@ -53,6 +56,11 @@ exports.addProductToCategory = async (req, res, next) => {
           categoryId,
           { $push: { products: savedProduct._id } },
           { new: true }
+        );
+
+        await Ingrediant.updateMany(
+          { _id: { $in: ingrediantIds } },
+          { $push: { product: savedProduct._id } }
         );
 
         res.status(201).json({
@@ -108,7 +116,14 @@ exports.deleteProduct = async (req, res, next) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-
+    await Category.updateMany(
+      { products: productId },
+      { $pull: { products: productId } }
+    );
+    await Ingrediant.updateMany(
+      { product: productId },
+      { $pull: { product: productId } }
+    );
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(400).json({

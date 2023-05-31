@@ -117,7 +117,7 @@ exports.getIngredientsByType = async (req, res, next) => {
 
 exports.getAllIngrediants = async (req, res, next) => {
   try {
-    const ingrediants = await Ingrediant.find();
+    const ingrediants = await Ingrediant.find().populate("type");
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({

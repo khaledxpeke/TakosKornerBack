@@ -27,7 +27,7 @@ exports.addDesert = async (req, res, next) => {
         currency,
       });
       res.status(201).json({
-        deserts,
+        deserts,message:"Dessert créer avec succées"
       });
     } catch (error) {
       res.status(400).json({
@@ -71,7 +71,7 @@ exports.deleteDesert = async (req, res, next) => {
     const { desertId } = req.params;
     const deserts = await Desert.findByIdAndDelete(desertId);
     res.status(200).json({
-      message: "Desert successfully deleted",
+      message: "Dessert supprimé avec succées",
     });
   } catch (error) {
     res.status(400).json({
