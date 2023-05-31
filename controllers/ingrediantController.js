@@ -8,6 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 
@@ -167,7 +168,15 @@ exports.deleteIngredient = async (req, res, next) => {
         message: "Ingredient not found",
       });
     }
-
+    if (ingrediant.image) {
+      fs.unlink(ingrediant.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "ingrediant image not found",
+          });
+        }
+      });
+    }
     await Ingrediant.deleteOne({ _id: ingrediant._id });
 
     // Remove the ingredient from the product's ingredients array

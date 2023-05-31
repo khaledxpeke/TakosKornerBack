@@ -9,6 +9,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 exports.createSupplement = async (req, res, next) => {
@@ -130,6 +131,15 @@ exports.deleteSupplement = async (req, res, next) => {
     if (!supplements) {
       return res.status(404).json({
         message: "Supplement not found",
+      });
+    }
+    if (supplements.image) {
+      fs.unlink(supplements.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "supplements image not found",
+          });
+        }
       });
     }
 

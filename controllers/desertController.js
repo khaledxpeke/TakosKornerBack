@@ -7,6 +7,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 exports.addDesert = async (req, res, next) => {
@@ -69,7 +70,17 @@ exports.getDesertById = async (req, res, next) => {
 exports.deleteDesert = async (req, res, next) => {
   try {
     const { desertId } = req.params;
-    const deserts = await Desert.findByIdAndDelete(desertId);
+    const deserts = await Desert.findById(desertId);
+    if (deserts.image) {
+      fs.unlink(deserts.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "deserts image not found",
+          });
+        }
+      });
+    }
+    await Desert.findByIdAndDelete(deserts);
     res.status(200).json({
       message: "Dessert supprimé avec succées",
     });

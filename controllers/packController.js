@@ -7,6 +7,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 exports.addPack = async (req, res, next) => {
@@ -90,12 +91,22 @@ exports.updatePack = async (req, res, next) => {
 exports.deletePack = async (req, res, next) => {
   const { packId } = req.params;
   try {
-    const pack = await Pack.findByIdAndDelete(packId);
+    const pack = await Pack.findById(packId);
     if (!pack) {
       return res.status(404).json({
         message: "il n'y a pas de formule avec cet id",
       });
     }
+    if (pack.image) {
+      fs.unlink(pack.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "pack image not found",
+          });
+        }
+      });
+    }
+    await Pack.findByIdAndDelete(pack);
     res.status(200).json({
       message: "Formule supprimer avec succées",
     });
