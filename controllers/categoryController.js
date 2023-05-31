@@ -92,11 +92,12 @@ exports.deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
+    console.log(category.image)
     if (category.image) {
-      fs.unlink(device.image, (err) => {
+      fs.unlink(category.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "Device image not found",
+            message: "category image not found",
           });
         }
       });

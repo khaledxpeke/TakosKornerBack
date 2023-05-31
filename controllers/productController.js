@@ -11,6 +11,7 @@ const multerStorage = require("../middleware/multerStorage");
 app.use(express.json());
 // Set up multer upload middleware with the imported storage configuration
 const upload = multer({ storage: multerStorage });
+const fs = require("fs");
 
 exports.addProductToCategory = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
@@ -107,15 +108,22 @@ exports.getAllProducts = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
-  const { productId } = req.params;
+  const  productId  = req.params.productId;
   try {
-    const product = await Product.findByIdAndDelete({
-      _id: productId,
-    });
-
+    const product = await Product.findById(productId)
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
+    if (product.image) {
+      fs.unlink(product.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "product image not found",
+          });
+        }
+      });
+    }
+    await Product.findByIdAndDelete(product);
     await Category.updateMany(
       { products: productId },
       { $pull: { products: productId } }
