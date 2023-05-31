@@ -5,6 +5,7 @@ require("dotenv").config();
 app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 exports.createCategory = async (req, res) => {
@@ -25,7 +26,7 @@ exports.createCategory = async (req, res) => {
 
     try {
       const newCategory = await category.save();
-      res.status(201).json(newCategory);
+      res.status(201).json({newCategory,message:"category created successfully"});
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
@@ -87,12 +88,21 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   const categoryId = req.params.categoryId;
   try {
-    const category = await Category.findByIdAndDelete({
-      _id: categoryId,
-    });
+    let category = await Category.findById(categoryId);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
+    if (category.image) {
+      fs.unlink(device.image, (err) => {
+        if (err) {
+          res.status(500).json({
+            message: "Device image not found",
+          });
+        }
+      });
+    }
+    await Category.findByIdAndDelete(category);
+
     res.status(200).json({ message: "category deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -19,7 +19,7 @@ exports.createIngredient = async (req, res, next) => {
         error: err.message,
       });
     }
-    const { name, typeId, maxIngrediant } = req.body;
+    const { name, typeId } = req.body;
     const userId = req.user.id;
     const image = req.file.path;
     try {
@@ -30,7 +30,7 @@ exports.createIngredient = async (req, res, next) => {
         createdBy: userId,
       });
       await ingredient.save();
-      res.status(201).json(ingredient);
+      res.status(201).json({ingredient,message:"ingrediant créer avec succées"});
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",

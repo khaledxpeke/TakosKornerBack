@@ -35,6 +35,14 @@ exports.addHistory = async (req, res) => {
 };
 
 exports.getHistory = async (req, res) => {
-  const history = await History.find();
+  const history = await History.find().populate({
+    path: "product",
+    populate: [
+      {
+        path: "plat",
+        select: "name currency price",
+      },
+    ],
+  });
   res.status(200).json(history);
 }
