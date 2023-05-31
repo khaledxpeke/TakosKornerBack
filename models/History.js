@@ -27,6 +27,10 @@ const historySchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  boughtAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("History", historySchema);
