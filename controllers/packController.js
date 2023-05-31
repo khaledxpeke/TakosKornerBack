@@ -30,7 +30,7 @@ exports.addPack = async (req, res, next) => {
         createdBy: userId,
       });
       await pack.save();
-      res.status(201).json(pack);
+      res.status(201).json({pack,message:"formule créer avec succées"});
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",
@@ -90,15 +90,14 @@ exports.updatePack = async (req, res, next) => {
 exports.deletePack = async (req, res, next) => {
   const { packId } = req.params;
   try {
-    const pack = await Pack.findById(packId);
+    const pack = await Pack.findByIdAndDelete(packId);
     if (!pack) {
       return res.status(404).json({
-        message: "Pack not found",
+        message: "il n'y a pas de formule avec cet id",
       });
     }
-    await pack.remove();
     res.status(200).json({
-      message: "Pack deleted",
+      message: "Formule supprimer avec succées",
     });
   } catch (error) {
     res.status(400).json({

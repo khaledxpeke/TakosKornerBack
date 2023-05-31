@@ -31,7 +31,7 @@ exports.createSupplement = async (req, res, next) => {
         createdBy: userId,
       });
       res.status(201).json({
-        supplements,
+        supplements,message:"supplement created successfully"
       });
     } catch (error) {
       res.status(400).json({

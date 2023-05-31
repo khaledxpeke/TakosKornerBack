@@ -11,6 +11,6 @@ const {
 router.route("/").post(userAuth, addPack);
 router.route("/").get(getPacks);
 router.route("/:packId").post(userAuth, updatePack);
-router.route("/").delete(userAuth, deletePack);
+router.route("/:packId").delete(userAuth, deletePack);
 
 module.exports = router;
