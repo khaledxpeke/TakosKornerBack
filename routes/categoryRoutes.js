@@ -11,7 +11,7 @@ const {
 router.route("/").post(userAuth, createCategory);
 router.route("/").get(getAllCategories);
 router.route("/:categoryId").get(getCategoryById);
-router.route("/update/categoryId").put(userAuth, updateCategory);
+router.route("/update/:categoryId").put(userAuth, updateCategory);
 router.route("/:categoryId").delete(userAuth, deleteCategory);
 
 module.exports = router;

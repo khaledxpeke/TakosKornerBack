@@ -77,9 +77,8 @@ exports.updateCategory = async (req, res) => {
     }
     category.name = req.body.name || category.name;
     category.image = req.body.image || category.image;
-    category.products = req.body.products || category.products;
     const updatedCategory = await category.save();
-    res.status(200).json(updatedCategory, { message: "Category updated successfully" });
+    res.status(200).json({updatedCategory,  message: "Category updated successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
