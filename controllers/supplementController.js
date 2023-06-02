@@ -20,6 +20,13 @@ exports.createSupplement = async (req, res, next) => {
         error: err.message,
       });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Ajouter une image",
+        error: "Please upload an image",
+      });
+    }
+
     const { name, price, currency } = req.body;
     const userId = req.user.id;
     const image = req.file.path;

@@ -11,25 +11,40 @@ const upload = multer({ storage: multerStorage });
 exports.createCategory = async (req, res) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
+      if (err.code === "LIMIT_UNEXPECTED_FILE") {
+        return res.status(400).json({
+          message: "No image provided",
+          error: err.message,
+        });
+      }
       return res.status(400).json({
         message: "Image upload failed",
         error: err.message,
       });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Ajouter une image",
+        error: "Please upload an image",
+      });
+    }
+
     const userId = req.user.id;
-    const image = req.file.path;
     const category = new Category({
       createdBy: userId,
       name: req.body.name,
-      image: image,
+      image: req.file.path,
     });
-
     try {
       const newCategory = await category.save();
       res
         .status(201)
         .json({ newCategory, message: "categorie créer avec succées" });
     } catch (error) {
+      if (image) {
+        // Delete the uploaded image if an error occurred while saving the category
+        fs.unlinkSync(image);
+      }
       res.status(400).json({ message: error.message });
     }
   });

@@ -21,6 +21,13 @@ exports.addProductToCategory = async (req, res, next) => {
         error: err.message,
       });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Ajouter une image",
+        error: "Please upload an image",
+      });
+    }
+
     const { categoryId } = req.params;
     const userId = req.user.id;
     const price = Number(req.body.price ?? "");

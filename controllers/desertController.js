@@ -18,6 +18,13 @@ exports.addDesert = async (req, res, next) => {
         error: err.message,
       });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Ajouter une image",
+        error: "Please upload an image",
+      });
+    }
+
     const { name, price,currency } = req.body;
     const image = req.file.path;
     try {

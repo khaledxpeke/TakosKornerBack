@@ -19,6 +19,7 @@ exports.addPack = async (req, res, next) => {
         error: err.message,
       });
     }
+
     const { name, price, currency } = req.body;
     const userId = req.user.id;
     const image = req.file?.path || "";
