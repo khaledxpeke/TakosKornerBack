@@ -36,6 +36,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const { currency, type, maxIngrediant } = req.body;
     const typeIds = type?.split(",") || [];
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
+    const supplementIds = req.body.supplements?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
 
@@ -53,6 +54,7 @@ exports.addProductToCategory = async (req, res, next) => {
           createdBy: userId,
           maxIngrediant,
           ingrediants: ingrediantIds,
+          supplements: supplementIds,
         });
         if (image) {
           product.image = image;
