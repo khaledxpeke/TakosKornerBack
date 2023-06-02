@@ -46,3 +46,18 @@ exports.getHistory = async (req, res) => {
   });
   res.status(200).json(history);
 }
+
+exports.getLast10Orders = async (req, res) => {
+  try {
+    const orders = await History.find()
+      .sort({ boughtAt: -1 })
+      .limit(10)
+      .populate("product.plat"); // Populate the "plat" field with the referenced "Product" document
+
+    res.status(200).json(orders);
+  } catch (error) {
+    // Handle the error
+    res.status(500).json({ message: error.message });
+    throw error;
+  }
+};

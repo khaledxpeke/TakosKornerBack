@@ -92,9 +92,7 @@ exports.getProductsByCategory = async (req, res, next) => {
   const { categoryId } = req.params;
 
   try {
-    const products = await Product.find({ category: categoryId }).populate(
-      "supplements"
-    );
+    const products = await Product.find({ category: categoryId })
 
     res.status(200).json(products);
   } catch (error) {
