@@ -66,26 +66,39 @@ exports.getPackById = async (req, res, next) => {
   }
 };
 
-exports.updatePack = async (req, res, next) => {
-  const { name, image, price } = req.body;
-  try {
-    const pack = await Pack.findById(req.params.packId);
-    if (!pack) {
-      return res.status(404).json({
-        message: "Pack not found",
-      });
+exports.updatePack = async (req, res) => {
+  const packId = req.params.packId;
+  upload.single("image")(req, res, async (err) => {
+    const { name, price,currency } = req.body;
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Server error" });
     }
-    pack.name = name;
-    pack.image = image;
-    pack.price = price;
-    await pack.save();
-    res.status(200).json(pack);
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+    const pack = await Pack.findById(packId);
+    if (!pack) {
+      res.status(500).json({ message: "aucun Formule trouvée" });
+    }
+    if (req.file) {
+      if (pack.image) {
+        fs.unlinkSync(pack.image);
+      }
+      pack.image = req.file.path;
+    }
+    try {
+      const updatedpack = await Pack.findByIdAndUpdate(packId, {
+        name: name || pack.name,
+        price: price || pack.price,
+        currency: currency || pack.currency,
+        image: pack.image, 
+      });
+
+      res
+        .status(200)
+        .json({ message: "Formule modifiéer avec succées" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 };
 
 exports.deletePack = async (req, res, next) => {

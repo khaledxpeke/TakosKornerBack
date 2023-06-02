@@ -11,7 +11,7 @@ const {
 router.route("/").post(userAuth, createType);
 router.route("/").get(getAllTypes);
 router.route("/:typeId").get(getTypeById);
-router.route("/:typeId").post(userAuth, updateType);
+router.route("/update/:typeId").put(userAuth, updateType);
 router.route("/:typeId").delete(userAuth, deleteType);
 
 module.exports = router;

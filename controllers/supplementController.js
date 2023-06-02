@@ -161,3 +161,39 @@ exports.deleteSupplement = async (req, res, next) => {
     });
   }
 };
+
+exports.updateSupplement = async (req, res) => {
+  const supplementId = req.params.supplementId;
+  upload.single("image")(req, res, async (err) => {
+    const { name,type,price,currency } = req.body;
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Server error" });
+    }
+    const supplement = await Supplement.findById(supplementId);
+    if (!supplement) {
+      res.status(500).json({ message: "aucun Supplement trouvée" });
+    }
+    if (req.file) {
+      if (supplement.image) {
+        fs.unlinkSync(supplement.image);
+      }
+      supplement.image = req.file.path;
+    }
+    try {
+      const updatedsupplement = await Supplement.findByIdAndUpdate(supplementId, {
+        name: name || supplement.name,
+        price: price || supplement.price,
+        currency: currency || supplement.currency,
+        image: supplement.image,
+        type: type|| supplement.type,  
+      });
+
+      res
+        .status(200)
+        .json({ message: "Supplement modifié avec succées" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+};

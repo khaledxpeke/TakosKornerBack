@@ -91,21 +91,37 @@ exports.deleteDesert = async (req, res, next) => {
     });
   }
 };
+exports.updateDesert = async (req, res) => {
+  const desertId = req.params.desertId;
+  upload.single("image")(req, res, async (err) => {
+    const { name,price,currency } = req.body;
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Server error" });
+    }
+    const desert = await Desert.findById(desertId);
+    if (!desert) {
+      res.status(500).json({ message: "aucun Dessert trouvée" });
+    }
+    if (req.file) {
+      if (desert.image) {
+        fs.unlinkSync(desert.image);
+      }
+      desert.image = req.file.path;
+    }
+    try {
+      const updatedDesert = await Desert.findByIdAndUpdate(desertId, {
+        name: name || desert.name,
+        price: price || desert.price,
+        currency: currency || desert.currency,
+        image: desert.image, 
+      });
 
-exports.updateDesert = async (req, res, next) => {
-  const { desertId } = req.params;
-  const { name, price, image } = req.body;
-  try {
-    const deserts = await Desert.findByIdAndUpdate(desertId, {
-      name,
-      price,
-      image,
-    });
-    res.status(200).json({ deserts, message: "deserts successfully updated" });
-  } catch (error) {
-    res.status(400).json({
-      message: "No desert found",
-      error: error.message,
-    });
-  }
+      res
+        .status(200)
+        .json({ message: "Dessert modifiéer avec succées" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 };

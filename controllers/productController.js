@@ -108,9 +108,9 @@ exports.getAllProducts = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
-  const  productId  = req.params.productId;
+  const productId = req.params.productId;
   try {
-    const product = await Product.findById(productId)
+    const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -141,34 +141,48 @@ exports.deleteProduct = async (req, res, next) => {
   }
 };
 
-exports.updateProduct = async (req, res, next) => {
-  const { productId } = req.params;
-  const { name, price, image, currency, supplements, maxIngrediant } = req.body;
-
-  try {
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+exports.updateProduct = async (req, res) => {
+  const productId = req.params.productId;
+  upload.single("image")(req, res, async (err) => {
+    const {
+      name,
+      price,
+      currency,
+      supplements,
+      maxIngrediant,
+      ingrediants,
+    } = req.body;
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Server error" });
     }
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(500).json({ message: "aucun produit trouvée" });
+    }
+    if (req.file) {
+      if (product.image) {
+        fs.unlinkSync(product.image);
+      }
+      product.image = req.file.path;
+    }
+    if (supplements) {
+      product.supplements = req.body.supplements.split(",");
+    }
+    try {
+      const updatedproduct = await Product.findByIdAndUpdate(productId, {
+        name: name || product.name,
+        price: price || product.price,
+        supplements: product.supplements,
+        currency: currency || product.currency,
+        ingrediants: ingrediants.split(",") || product.ingrediants,
+        maxIngrediant: maxIngrediant || product.maxIngrediant,
+        image: product.image,
+      });
 
-    product.name = name;
-    product.price = price;
-    product.image = image;
-    product.currency = currency;
-    product.supplements = supplements;
-    product.maxIngrediant = maxIngrediant;
-
-    const updatedProduct = await product.save();
-
-    res.status(200).json({
-      message: "Product updated successfully",
-      product: updatedProduct,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+      res.status(200).json({ message: "Produit modifié avec succées" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 };

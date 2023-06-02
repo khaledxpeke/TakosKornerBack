@@ -77,7 +77,7 @@ exports.updateCategory = async (req, res) => {
     }
     const category = await Category.findById(categoryId);
     if (!category) {
-      res.status(500).json({ message: "No category found" });
+      res.status(500).json({ message: "aucun Category trouvée" });
     }
     if (req.file) {
       if (category.image) {
@@ -93,7 +93,7 @@ exports.updateCategory = async (req, res) => {
 
       res
         .status(200)
-        .json({ updatedcategory, message: "Category updated successfully" });
+        .json({ updatedcategory, message: "Categorie modifié avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

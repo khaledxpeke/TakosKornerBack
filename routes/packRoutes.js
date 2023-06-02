@@ -10,7 +10,7 @@ const {
 
 router.route("/").post(userAuth, addPack);
 router.route("/").get(getPacks);
-router.route("/:packId").post(userAuth, updatePack);
+router.route("/update/:packId").put(userAuth, updatePack);
 router.route("/:packId").delete(userAuth, deletePack);
 
 module.exports = router;

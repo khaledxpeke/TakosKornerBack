@@ -11,7 +11,7 @@ const {
 router.route("/").post(userAuth, addDesert);
 router.route("/").get(getAllDeserts);
 router.route("/:desertId").get(getDesertById);
-router.route("/update/:desertId").post(userAuth, updateDesert);
+router.route("/update/:desertId").put(userAuth, updateDesert);
 router.route("/:desertId").delete(userAuth, deleteDesert);
 
 module.exports = router;

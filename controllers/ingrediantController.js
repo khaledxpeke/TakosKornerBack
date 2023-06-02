@@ -128,33 +128,38 @@ exports.getAllIngrediants = async (req, res, next) => {
   }
 };
 
-exports.updateIngrediant = async (req, res, next) => {
-  const { id } = req.params;
-  const { name, image, type } = req.body;
-
-  try {
-    const ingrediant = await Ingrediant.findById(id);
-
-    if (!ingrediant) {
-      return res.status(404).json({ message: "Ingredient not found" });
+exports.updateIngrediant = async (req, res) => {
+  const ingrediantId = req.params.ingrediantId;
+  upload.single("image")(req, res, async (err) => {
+    const { name,type } = req.body;
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Server error" });
     }
+    const ingrediant = await Ingrediant.findById(ingrediantId);
+    if (!ingrediant) {
+      res.status(500).json({ message: "aucun Ingrediant trouvée" });
+    }
+    if (req.file) {
+      if (ingrediant.image) {
+        fs.unlinkSync(ingrediant.image);
+      }
+      ingrediant.image = req.file.path;
+    }
+    try {
+      const updatedingrediant = await Ingrediant.findByIdAndUpdate(ingrediantId, {
+        name: name || ingrediant.name,
+        image: ingrediant.image,
+        type: type|| ingrediant.type,  
+      });
 
-    // Update the fields
-    ingrediant.name = name || ingrediant.name;
-    ingrediant.image = image || ingrediant.image;
-    ingrediant.type = type || ingrediant.type;
-
-    await ingrediant.save();
-
-    res.status(200).json({
-      ingrediant,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Some error occured",
-      error: error.message,
-    });
-  }
+      res
+        .status(200)
+        .json({ message: "Ingrediant modifié avec succées" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 };
 
 exports.deleteIngredient = async (req, res, next) => {

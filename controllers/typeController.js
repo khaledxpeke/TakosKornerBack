@@ -57,11 +57,11 @@ exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
     const { name } = req.body;
-    const type = await Type.findByIdAndUpdate(typeId, { name }, { new: true });
-    res.status(200).json(type);
+    const type = await Type.findByIdAndUpdate(typeId, { name });
+    res.status(200).json({message:"Type modifié avec succées"});
   } catch (error) {
     res.status(400).json({
-      message: "No type found",
+      message: "some error occured",
       error: error.message,
     });
   }
