@@ -48,14 +48,14 @@ exports.addIngrediantToProduct = async (req, res, next) => {
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
-        message: `Product not found with ID: ${productId}`,
+        message: `Aucun produit trouvé avec cet ID: ${productId}`,
       });
     }
 
     const ingrediant = await Ingrediant.findById(ingrediantId);
     if (!ingrediant) {
       return res.status(404).json({
-        message: `Ingrediant not found with ID: ${ingrediantId}`,
+        message: `Aucun ingrediant trouvé avec cet ID: ${ingrediantId}`,
       });
     }
 
@@ -65,7 +65,7 @@ exports.addIngrediantToProduct = async (req, res, next) => {
     );
     if (ingrediantIndex !== -1) {
       return res.status(409).json({
-        message: `Ingrediant with ID ${ingrediantId} already exists in the product`,
+        message: `Ingrediant avec ID ${ingrediantId} déja existant dans le produit`,
       });
     }
 
@@ -93,7 +93,7 @@ exports.getIngrediantByProduct = async (req, res, next) => {
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({
-      message: "No ingrediants found",
+      message: "Aucun ingrediant trouvé",
       error: error.message,
     });
   }
@@ -122,7 +122,7 @@ exports.getAllIngrediants = async (req, res, next) => {
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({
-      message: "No ingrediants found",
+      message: "Aucun ingrediant trouvé",
       error: error.message,
     });
   }
@@ -170,14 +170,14 @@ exports.deleteIngredient = async (req, res, next) => {
 
     if (!ingrediant) {
       return res.status(404).json({
-        message: "Ingredient not found",
+        message: "Aucun ingrediant trouvé",
       });
     }
     if (ingrediant.image) {
       fs.unlink(ingrediant.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "ingrediant image not found",
+            message: "Aucun ingrediant image trouvé",
           });
         }
       });
@@ -190,7 +190,7 @@ exports.deleteIngredient = async (req, res, next) => {
     });
 
     res.status(200).json({
-      message: "Ingredient deleted successfully",
+      message: "Ingredient supprimer avec succées",
     });
   } catch (error) {
     res.status(500).json({

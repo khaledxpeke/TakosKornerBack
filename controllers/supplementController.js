@@ -32,7 +32,7 @@ exports.createSupplement = async (req, res, next) => {
         createdBy: userId,
       });
       res.status(201).json({
-        supplements,message:"supplement created successfully"
+        supplements,message:"supplement créer avec succées"
       });
     } catch (error) {
       res.status(400).json({
@@ -49,20 +49,20 @@ exports.addSupplementToProduct = async (req, res, next) => {
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
-        message: `Product not found with ID: ${productId}`,
+        message: `Aucun produit avec cet ID: ${productId}`,
       });
     }
 
     const supplement = await Supplement.findById(supplementId);
     if (!supplement) {
       return res.status(404).json({
-        message: `Supplement not found with ID: ${supplementId}`,
+        message: `Aucun supplement avec cet ID: ${supplementId}`,
       });
     }
 
     if (product.supplements.includes(supplementId)) {
       return res.status(409).json({
-        message: `Supplement with ID ${supplementId} already exists in the product`,
+        message: `Supplement avec ID ${supplementId} existe déjà dans le produit`,
       });
     }
 
@@ -90,7 +90,7 @@ exports.getSupplementByProduct = async (req, res, next) => {
     res.status(200).json(supplements);
   } catch (error) {
     res.status(400).json({
-      message: "No supplements found",
+      message: "Aucun supplement trouvé",
       error: error.message,
     });
   }
@@ -102,7 +102,7 @@ exports.getAllSupplements = async (req, res, next) => {
     res.status(200).json(supplements);
   } catch (error) {
     res.status(400).json({
-      message: "No supplements found",
+      message: "Auucun supplement trouvé",
       error: error.message,
     });
   }
@@ -117,7 +117,7 @@ exports.getSupplementById = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: "No supplement found",
+      message: "Auucun supplement trouvé",
       error: error.message,
     });
   }
@@ -130,14 +130,14 @@ exports.deleteSupplement = async (req, res, next) => {
 
     if (!supplements) {
       return res.status(404).json({
-        message: "Supplement not found",
+        message: "Auucun supplement trouvé",
       });
     }
     if (supplements.image) {
       fs.unlink(supplements.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "supplements image not found",
+            message: "Auucun supplement image trouvé",
           });
         }
       });
@@ -151,7 +151,7 @@ exports.deleteSupplement = async (req, res, next) => {
     });
 
     res.status(200).json({
-      message: "Supplement deleted successfully",
+      message: "Supplement ajouté avec succées",
       supplements,
     });
   } catch (error) {

@@ -34,7 +34,7 @@ exports.addProductToCategory = async (req, res, next) => {
 
       if (product) {
         return res.status(400).json({
-          message: "Product already exists",
+          message: "Produit existe déja",
         });
       } else {
         const product = new Product({
@@ -67,7 +67,7 @@ exports.addProductToCategory = async (req, res, next) => {
         res.status(201).json({
           product: savedProduct,
           category: updatedCategory,
-          message: "Product added successfully",
+          message: "Product ajouté avec succées",
         });
       }
     } catch (error) {
@@ -112,13 +112,13 @@ exports.deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Aucun produit trouvé" });
     }
     if (product.image) {
       fs.unlink(product.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "product image not found",
+            message: "Aucun produit image trouvé",
           });
         }
       });
@@ -132,7 +132,7 @@ exports.deleteProduct = async (req, res, next) => {
       { product: productId },
       { $pull: { product: productId } }
     );
-    res.status(200).json({ message: "Product deleted successfully" });
+    res.status(200).json({ message: "Product supprimer avec succées" });
   } catch (error) {
     res.status(400).json({
       message: "Some error occured",

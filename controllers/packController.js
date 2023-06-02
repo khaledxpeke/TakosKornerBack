@@ -47,7 +47,7 @@ exports.getPacks = async (req, res, next) => {
     res.status(200).json(packs);
   } catch (error) {
     res.status(400).json({
-      message: "No packs found",
+      message: "Aucune Formule trouvé",
       error: error.message,
     });
   }
@@ -60,7 +60,7 @@ exports.getPackById = async (req, res, next) => {
     res.status(200).json(pack);
   } catch (error) {
     res.status(400).json({
-      message: "No pack found",
+      message: "Aucune Formule trouvé",
       error: error.message,
     });
   }
@@ -114,7 +114,7 @@ exports.deletePack = async (req, res, next) => {
       fs.unlink(pack.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "pack image not found",
+            message: "Aucune Formule image trouvé",
           });
         }
       });

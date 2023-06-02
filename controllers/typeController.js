@@ -13,14 +13,14 @@ exports.createType = async (req, res, next) => {
     // Check if the type already exists
     const existingType = await Type.findOne({ name });
     if (existingType) {
-      return res.status(400).json({ message: "Type already exists" });
+      return res.status(400).json({ message: "Type existe déja" });
     }
 
     // Create a new type
     const newType = new Type({ name });
     await newType.save();
 
-    res.status(201).json({ message: "Type created successfully" });
+    res.status(201).json({ message: "Type créer avec succées" });
   } catch (error) {
     res
       .status(500)
@@ -34,7 +34,7 @@ exports.getAllTypes = async (req, res, next) => {
     res.status(200).json(types);
   } catch (error) {
     res.status(400).json({
-      message: "No types found",
+      message: "Aucun type trouvé",
       error: error.message,
     });
   }
@@ -47,7 +47,7 @@ exports.getTypeById = async (req, res, next) => {
     res.status(200).json(type);
   } catch (error) {
     res.status(400).json({
-      message: "No type found",
+      message: "Aucun type trouvé",
       error: error.message,
     });
   }
@@ -71,10 +71,10 @@ exports.deleteType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
     await Type.findByIdAndDelete(typeId);
-    res.status(200).json({ message: "Type deleted successfully" });
+    res.status(200).json({ message: "Type supprimer avec succées" });
   } catch (error) {
     res.status(400).json({
-      message: "No type found",
+      message: "Aucun type trouvé",
       error: error.message,
     });
   }

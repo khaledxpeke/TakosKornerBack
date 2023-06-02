@@ -28,7 +28,7 @@ exports.createCategory = async (req, res) => {
       const newCategory = await category.save();
       res
         .status(201)
-        .json({ newCategory, message: "category created successfully" });
+        .json({ newCategory, message: "categorie créer avec succées" });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
@@ -60,7 +60,7 @@ exports.getCategoryById = async (req, res) => {
   try {
     const category = await Category.findById(categoryId).populate("products");
     if (!category) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(404).json({ message: "Aucun categorie trouvée" });
     }
     res.status(200).json(category);
   } catch (error) {
@@ -77,7 +77,7 @@ exports.updateCategory = async (req, res) => {
     }
     const category = await Category.findById(categoryId);
     if (!category) {
-      res.status(500).json({ message: "aucun Category trouvée" });
+      res.status(500).json({ message: "Aucun Categorie trouvée" });
     }
     if (req.file) {
       if (category.image) {
@@ -105,21 +105,21 @@ exports.deleteCategory = async (req, res) => {
   try {
     let category = await Category.findById(categoryId);
     if (!category) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(404).json({ message: "Aucun Categorie trouvée" });
     }
     console.log(category.image);
     if (category.image) {
       fs.unlink(category.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "category image not found",
+            message: "Aucun Categorie image trouvée",
           });
         }
       });
     }
     await Category.findByIdAndDelete(category);
 
-    res.status(200).json({ message: "category deleted successfully" });
+    res.status(200).json({ message: "categorie supprimée avec succées" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

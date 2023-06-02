@@ -46,7 +46,7 @@ exports.getAllDeserts = async (req, res, next) => {
     res.status(200).json(deserts);
   } catch (error) {
     res.status(400).json({
-      message: "No deserts found",
+      message: "Aucun dessert trouvé",
       error: error.message,
     });
   }
@@ -61,7 +61,7 @@ exports.getDesertById = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: "No desert found",
+      message: "Aucun dessert trouvé",
       error: error.message,
     });
   }
@@ -75,7 +75,7 @@ exports.deleteDesert = async (req, res, next) => {
       fs.unlink(deserts.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "deserts image not found",
+            message: "Aucun dessert image trouvé",
           });
         }
       });
@@ -86,7 +86,7 @@ exports.deleteDesert = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: "No desert found to be deleted",
+      message: "Aucun dessert trouvé pour supprimer",
       error: error.message,
     });
   }
