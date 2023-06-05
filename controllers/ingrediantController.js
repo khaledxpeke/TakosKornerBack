@@ -38,7 +38,9 @@ exports.createIngredient = async (req, res, next) => {
         createdBy: userId,
       });
       await ingredient.save();
-      res.status(201).json({ingredient,message:"ingrediant créer avec succées"});
+      res
+        .status(201)
+        .json({ ingredient, message: "ingrediant créer avec succées" });
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",
@@ -138,7 +140,7 @@ exports.getAllIngrediants = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name,type } = req.body;
+    const { name, type } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -154,15 +156,33 @@ exports.updateIngrediant = async (req, res) => {
       ingrediant.image = req.file.path;
     }
     try {
-      const updatedingrediant = await Ingrediant.findByIdAndUpdate(ingrediantId, {
-        name: name || ingrediant.name,
-        image: ingrediant.image,
-        type: type|| ingrediant.type,  
-      });
+      ingrediant.name = name || ingrediant.name;
+      ingrediant.type = type || ingrediant.type;
+      const updatedIngrediant = await ingrediant.save();
 
-      res
-        .status(200)
-        .json({ message: "Ingrediant modifié avec succées" });
+      const products = await Product.find({ ingrediants: ingrediantId });
+
+      for (const product of products) {
+        const ingrediants = await Promise.all(
+          product.ingrediants.map(async (ingrediant) => {
+            return await Ingrediant.findById(ingrediant);
+          })
+        );
+        const types = ingrediants.map((ingrediant) => ingrediant.type);
+        const uniqueTypes = types.reduce((unique, current) => {
+          const isDuplicate = unique.some(
+            (obj) => obj.valueOf() === current.valueOf()
+          );
+          if (!isDuplicate) {
+            unique.push(current);
+          }
+          return unique;
+        }, []);
+        product.type = uniqueTypes;
+        await product.save();
+      }
+
+      res.status(200).json({ message: "Ingrediant modifié avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

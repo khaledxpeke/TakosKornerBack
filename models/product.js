@@ -25,7 +25,6 @@ const ProductSchema = new Mongoose.Schema({
   },
   supplements: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Supplement" }],
   ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
-  noingredients: [{ type: Mongoose.Schema.Types.ObjectId, ref: "NoIngredient" }],
   type : [{
     type: Mongoose.Schema.Types.ObjectId,
     ref: "Type",
