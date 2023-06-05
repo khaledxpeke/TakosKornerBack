@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
 exports.register = async (req, res, next) => {
-  const { email, password,fullName} = req.body;
+  const { email, password, fullName } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(400).json({ message: "User already exists" });
@@ -70,7 +70,7 @@ exports.login = async (req, res, next) => {
     } else {
       bcrypt.compare(password, user.password).then(function (result) {
         if (result) {
-          const maxAge = 3 * 60;
+          const maxAge = 8 * 60 * 60;
           const tokenPayload = {
             user: user,
             expiresAt: Date.now() + maxAge * 1000, // Expiration time in milliseconds
