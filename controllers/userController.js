@@ -70,8 +70,12 @@ exports.login = async (req, res, next) => {
     } else {
       bcrypt.compare(password, user.password).then(function (result) {
         if (result) {
-          const maxAge = 3 * 60 * 60;
-          const token = jwt.sign({ id: user._id, email }, jwtSecret, {
+          const maxAge = 3 * 60;
+          const tokenPayload = {
+            user: user,
+            expiresAt: Date.now() + maxAge * 1000, // Expiration time in milliseconds
+          };
+          const token = jwt.sign(tokenPayload, jwtSecret, {
             expiresIn: maxAge, // 3hrs in sec
           });
           res.cookie("jwt", token, {
@@ -79,7 +83,6 @@ exports.login = async (req, res, next) => {
             maxAge: maxAge * 1000, // 3hrs in ms
           });
           res.status(201).json({
-            user: user,
             token: token,
           });
         } else {
