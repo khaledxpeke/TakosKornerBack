@@ -176,7 +176,7 @@ exports.updateProduct = async (req, res) => {
         price: price || product.price,
         supplements: product.supplements,
         currency: currency || product.currency,
-        category: category || product.category,
+        category: category ,
         ingrediants: ingrediants.split(",") || product.ingrediants,
         maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
@@ -198,6 +198,10 @@ exports.updateProduct = async (req, res) => {
         return unique;
       }, []);
       await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
+      await Category.findByIdAndUpdate(product.category, { $pull: { products: productId } });
+
+      // Add the product to the new category
+      await Category.findByIdAndUpdate(category, { $addToSet: { products: productId } });
       res.status(200).json({ message: "Produit modifié avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
