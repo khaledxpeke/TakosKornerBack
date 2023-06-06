@@ -35,7 +35,7 @@ exports.addHistory = async (req, res) => {
 };
 
 exports.getHistory = async (req, res) => {
-  const history = await History.find().populate({
+  const history = await History.find().sort({ boughtAt: -1 }).populate({
     path: "product",
     populate: [
       {

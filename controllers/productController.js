@@ -151,7 +151,7 @@ exports.deleteProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res) => {
   const productId = req.params.productId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price, currency, supplements, maxIngrediant, ingrediants } =
+    const { name, price, currency, supplements, maxIngrediant, ingrediants ,category} =
       req.body;
     if (err) {
       console.log(err);
@@ -176,6 +176,7 @@ exports.updateProduct = async (req, res) => {
         price: price || product.price,
         supplements: product.supplements,
         currency: currency || product.currency,
+        category: category || product.category,
         ingrediants: ingrediants.split(",") || product.ingrediants,
         maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
