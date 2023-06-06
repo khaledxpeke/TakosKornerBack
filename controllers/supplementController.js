@@ -28,7 +28,7 @@ exports.createSupplement = async (req, res, next) => {
     }
 
     const { name, price, currency } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.user._id;
     const image = req.file.path;
     try {
       const supplements = await Supplement.create({

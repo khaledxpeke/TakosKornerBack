@@ -29,7 +29,7 @@ exports.addProductToCategory = async (req, res, next) => {
     }
 
     const { categoryId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.user._id;
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request

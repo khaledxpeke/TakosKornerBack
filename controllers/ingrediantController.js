@@ -28,7 +28,7 @@ exports.createIngredient = async (req, res, next) => {
     }
 
     const { name, typeId } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.user._id;
     const image = req.file.path;
     try {
       const ingredient = await Ingrediant.create({

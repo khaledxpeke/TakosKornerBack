@@ -72,8 +72,7 @@ exports.login = async (req, res, next) => {
         if (result) {
           const maxAge = 8 * 60 * 60;
           const tokenPayload = {
-            user: user,
-            expiresAt: Date.now() + maxAge * 1000, // Expiration time in milliseconds
+            user: user
           };
           const token = jwt.sign(tokenPayload, jwtSecret, {
             expiresIn: maxAge, // 3hrs in sec
@@ -114,7 +113,7 @@ exports.getUsers = async (req, res, next) => {
 };
 
 exports.getUserbyId = async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user.user._id;
   if (!userId) {
     res.status(400).json({ message: " Id not present" });
   } else {

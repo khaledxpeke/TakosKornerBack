@@ -29,7 +29,7 @@ exports.createCategory = async (req, res) => {
       });
     }
 
-    const userId = req.user.id;
+    const userId = req.user.user._id;
     const category = new Category({
       createdBy: userId,
       name: req.body.name,
