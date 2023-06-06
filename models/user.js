@@ -9,6 +9,10 @@ const UserSchema = new Mongoose.Schema({
         type: String,
         required: true,
       },
+      fullName: {
+        type: String,
+        required: true,
+      },
 
 });
 

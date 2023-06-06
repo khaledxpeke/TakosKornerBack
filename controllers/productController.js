@@ -92,7 +92,7 @@ exports.getProductsByCategory = async (req, res, next) => {
   const { categoryId } = req.params;
 
   try {
-    const products = await Product.find({ category: categoryId })
+    const products = await Product.find({ category: categoryId });
 
     res.status(200).json(products);
   } catch (error) {
@@ -151,14 +151,8 @@ exports.deleteProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res) => {
   const productId = req.params.productId;
   upload.single("image")(req, res, async (err) => {
-    const {
-      name,
-      price,
-      currency,
-      supplements,
-      maxIngrediant,
-      ingrediants,
-    } = req.body;
+    const { name, price, currency, supplements, maxIngrediant, ingrediants } =
+      req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -186,7 +180,23 @@ exports.updateProduct = async (req, res) => {
         maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
       });
-
+      const updatedIngrediants = ingrediants.split(",") || product.ingrediants;
+      const productIngrediants = await Promise.all(
+        updatedIngrediants.map(async (ingrediant) => {
+          return await Ingrediant.findById(ingrediant);
+        })
+      );
+      const types = productIngrediants.map((ingrediant) => ingrediant.type);
+      const uniqueTypes = types.reduce((unique, current) => {
+        const isDuplicate = unique.some(
+          (obj) => obj.valueOf() === current.valueOf()
+        );
+        if (!isDuplicate) {
+          unique.push(current);
+        }
+        return unique;
+      }, []);
+      await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
       res.status(200).json({ message: "Produit modifié avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
