@@ -29,7 +29,7 @@ app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
 app.use("/api/type", require("./routes/typeRoutes"));
 app.use("/api/pack", require("./routes/packRoutes"));
 app.use("/api/history", require("./routes/historyRoutes"));
-app.use("/api/drink", require("./routes/historyRoutes"));
+app.use("/api/drink", require("./routes/drinkRoutes"));
 app.use("/api/uploads", express.static("uploads"));
 app.get(userAuth, (req, res) => res.send("User Route"));
 app.get("/logout", (req, res) => {
