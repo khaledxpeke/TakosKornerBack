@@ -3,15 +3,6 @@ const app = express();
 const connectDB = require("./db/db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const userRoutes = require("./routes/userRoutes");
-const productRoutes = require("./routes/productRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
-const desertRoutes = require("./routes/desertRoutes");
-const supplementRoutes = require("./routes/supplementRoutes");
-const ingrediantRoutes = require("./routes/ingrediantRoutes");
-const typeRoutes = require("./routes/typeRoutes");
-const packRoutes = require("./routes/packRoutes");
-const historyRoutes = require("./routes/historyRoutes");
 const { userAuth } = require("./middleware/auth");
 app.timeout = 300000;
 app.use(
@@ -38,6 +29,7 @@ app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
 app.use("/api/type", require("./routes/typeRoutes"));
 app.use("/api/pack", require("./routes/packRoutes"));
 app.use("/api/history", require("./routes/historyRoutes"));
+app.use("/api/drink", require("./routes/historyRoutes"));
 app.use("/api/uploads", express.static("uploads"));
 app.get(userAuth, (req, res) => res.send("User Route"));
 app.get("/logout", (req, res) => {

@@ -35,7 +35,7 @@ exports.addDrink = async (req, res, next) => {
         currency,
       });
       res.status(201).json({
-        drinks,message:"Drink créer avec succées"
+        drinks,message:"Boissons créer avec succées"
       });
     } catch (error) {
       res.status(400).json({
@@ -46,87 +46,87 @@ exports.addDrink = async (req, res, next) => {
   });
 };
 
-exports.getAllDeserts = async (req, res, next) => {
+exports.getAllDrinks = async (req, res, next) => {
   try {
 
-    const deserts = await Desert.find();
-    res.status(200).json(deserts);
+    const drinks = await Drink.find();
+    res.status(200).json(drinks);
   } catch (error) {
     res.status(400).json({
-      message: "Aucun dessert trouvé",
+      message: "Aucun Boissons trouvé",
       error: error.message,
     });
   }
 };
 
-exports.getDesertById = async (req, res, next) => {
+exports.getDrinkById = async (req, res, next) => {
   try {
-    const { desertId } = req.params;
-    const deserts = await Desert.findById(desertId);
+    const { drinkId } = req.params;
+    const drink = await Drink.findById(drinkId);
     res.status(200).json({
-      deserts,
+        drink,
     });
   } catch (error) {
     res.status(400).json({
-      message: "Aucun dessert trouvé",
+      message: "Aucun boisson trouvé",
       error: error.message,
     });
   }
 };
 
-exports.deleteDesert = async (req, res, next) => {
+exports.deleteDrink = async (req, res, next) => {
   try {
-    const { desertId } = req.params;
-    const deserts = await Desert.findById(desertId);
-    if (deserts.image) {
-      fs.unlink(deserts.image, (err) => {
+    const { drinkId } = req.params;
+    const drinks = await Drink.findById(drinkId);
+    if (drinks.image) {
+      fs.unlink(drinks.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "Aucun dessert image trouvé",
+            message: "Aucun boisson image trouvé",
           });
         }
       });
     }
-    await Desert.findByIdAndDelete(deserts);
+    await Drink.findByIdAndDelete(drinks);
     res.status(200).json({
-      message: "Dessert supprimé avec succées",
+      message: "Boisson supprimé avec succées",
     });
   } catch (error) {
     res.status(400).json({
-      message: "Aucun dessert trouvé pour supprimer",
+      message: "Aucun boisson trouvé pour supprimer",
       error: error.message,
     });
   }
 };
-exports.updateDesert = async (req, res) => {
-  const desertId = req.params.desertId;
+exports.updateDrink = async (req, res) => {
+  const drinkId = req.params.drinkId;
   upload.single("image")(req, res, async (err) => {
     const { name,price,currency } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
     }
-    const desert = await Desert.findById(desertId);
-    if (!desert) {
-      res.status(500).json({ message: "aucun Dessert trouvée" });
+    const drink = await Drink.findById(drinkId);
+    if (!drink) {
+      res.status(500).json({ message: "aucun Boisson trouvée" });
     }
     if (req.file) {
-      if (desert.image) {
-        fs.unlinkSync(desert.image);
+      if (drink.image) {
+        fs.unlinkSync(drink.image);
       }
-      desert.image = req.file.path;
+      drink.image = req.file.path;
     }
     try {
-      const updatedDesert = await Desert.findByIdAndUpdate(desertId, {
-        name: name || desert.name,
-        price: price || desert.price,
-        currency: currency || desert.currency,
-        image: desert.image, 
+      const updatedDrink = await Drink.findByIdAndUpdate(drinkId, {
+        name: name || drink.name,
+        price: price || drink.price,
+        currency: currency || drink.currency,
+        image: drink.image, 
       });
 
       res
         .status(200)
-        .json({ message: "Dessert modifiéer avec succées" });
+        .json({ message: "Boisson modifiéer avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
