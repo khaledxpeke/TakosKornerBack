@@ -5,6 +5,9 @@ const typeSchema = mongoose.Schema({
       required: true,
       unique: true,
     },
+    message: {
+      type: String,
+    },
   });
   
   module.exports = mongoose.model("Type", typeSchema);
