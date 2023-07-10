@@ -76,7 +76,7 @@ exports.addProductToCategory = async (req, res, next) => {
           return unique;
         }, []);
         product.type = uniqueTypes;
-
+     
         // Save the product
         const savedProduct = await product.save();
 
