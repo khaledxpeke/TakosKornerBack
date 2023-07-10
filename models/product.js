@@ -38,6 +38,11 @@ const ProductSchema = new Mongoose.Schema({
   maxIngrediant: {
     type: Number,
   },
+  choice: {
+    type: String,
+    default: "seul",
+    enum: ["seul", "multiple"],
+  },
 });
 
 const Product = Mongoose.model("Product", ProductSchema);

@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, type, maxIngrediant } = req.body;
+    const { currency, type, maxIngrediant,choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const supplementIds = req.body.supplements?.split(",") || [];
     try {
@@ -54,6 +54,7 @@ exports.addProductToCategory = async (req, res, next) => {
           maxIngrediant,
           ingrediants: ingrediantIds,
           supplements: supplementIds,
+          choice,
         });
         if (image) {
           product.image = image;
@@ -171,7 +172,7 @@ exports.deleteProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res) => {
   const productId = req.params.productId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price, currency, supplements, maxIngrediant, ingrediants ,category} =
+    const { name, price, currency, supplements, maxIngrediant, ingrediants ,category,choice} =
       req.body;
     if (err) {
       console.log(err);
@@ -200,6 +201,7 @@ exports.updateProduct = async (req, res) => {
         ingrediants: ingrediants.split(",") || product.ingrediants,
         maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
+        choice: choice || product.choice,
       });
       const updatedIngrediants = ingrediants.split(",") || product.ingrediants;
       const productIngrediants = await Promise.all(
