@@ -42,6 +42,7 @@ const ProductSchema = new Mongoose.Schema({
     type: String,
     default: "seul",
     enum: ["seul", "multiple"],
+    required: true,
   },
 });
 
