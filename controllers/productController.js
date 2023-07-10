@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, type, maxIngrediant,choice } = req.body;
+    const { currency, type, maxIngrediant, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const supplementIds = req.body.supplements?.split(",") || [];
     try {
@@ -76,7 +76,7 @@ exports.addProductToCategory = async (req, res, next) => {
           return unique;
         }, []);
         product.type = uniqueTypes;
-     
+
         // Save the product
         const savedProduct = await product.save();
 
@@ -172,8 +172,16 @@ exports.deleteProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res) => {
   const productId = req.params.productId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price, currency, supplements, maxIngrediant, ingrediants ,category,choice} =
-      req.body;
+    const {
+      name,
+      price,
+      currency,
+      supplements,
+      maxIngrediant,
+      ingrediants,
+      category,
+      choice,
+    } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -190,6 +198,13 @@ exports.updateProduct = async (req, res) => {
     }
     if (supplements) {
       product.supplements = req.body.supplements.split(",");
+    } else {
+      product.supplements = [];
+    }
+    if (ingrediants) {
+      product.ingrediants = ingrediants.split(",");
+    } else {
+      product.ingrediants = [];
     }
     try {
       const updatedproduct = await Product.findByIdAndUpdate(productId, {
@@ -197,13 +212,16 @@ exports.updateProduct = async (req, res) => {
         price: price || product.price,
         supplements: product.supplements,
         currency: currency || product.currency,
-        category: category ,
-        ingrediants: ingrediants.split(",") || product.ingrediants,
+        category: category,
+        ingrediants: product.ingrediants,
         maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
         choice: choice || product.choice,
       });
-      const updatedIngrediants = ingrediants.split(",") || product.ingrediants;
+      let updatedIngrediants = [];
+      if (ingrediants !== undefined) {
+        updatedIngrediants = ingrediants.split(",");
+      }
       const productIngrediants = await Promise.all(
         updatedIngrediants.map(async (ingrediant) => {
           return await Ingrediant.findById(ingrediant);
@@ -220,10 +238,14 @@ exports.updateProduct = async (req, res) => {
         return unique;
       }, []);
       await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
-      await Category.findByIdAndUpdate(product.category, { $pull: { products: productId } });
+      await Category.findByIdAndUpdate(product.category, {
+        $pull: { products: productId },
+      });
 
       // Add the product to the new category
-      await Category.findByIdAndUpdate(category, { $addToSet: { products: productId } });
+      await Category.findByIdAndUpdate(category, {
+        $addToSet: { products: productId },
+      });
       res.status(200).json({ message: "Produit modifié avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
