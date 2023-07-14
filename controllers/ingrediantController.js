@@ -27,7 +27,7 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeId } = req.body;
+    const { name, typeId ,price,currency} = req.body;
     const userId = req.user.user._id;
     const image = req.file.path;
     try {
@@ -37,6 +37,10 @@ exports.createIngredient = async (req, res, next) => {
         type: typeId,
         createdBy: userId,
       });
+      if (price && currency) {
+        ingredient.price = price;
+        ingredient.currency = currency;
+      }
       await ingredient.save();
       res
         .status(201)

@@ -23,11 +23,30 @@ const ingrediantSchema = mongoose.Schema({
     ref: "Type",
     required: true,
   },
+  currency: {
+    type: String,
+  },
+  price: {
+    type: Number,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 });
-
+ingrediantSchema.add({
+  price: {
+    type: Number,
+    required: function () {
+      return this.currency != null; // Require price only if currency is provided
+    },
+  },
+  currency: {
+    type: String,
+    required: function () {
+      return this.price != null; // Require currency only if price is provided
+    },
+  },
+});
 module.exports = mongoose.model("Ingrediant", ingrediantSchema);
