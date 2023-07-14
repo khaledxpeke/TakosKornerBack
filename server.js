@@ -27,7 +27,7 @@ app.use("/api/desert", require("./routes/desertRoutes"));
 app.use("/api/supplement", require("./routes/supplementRoutes"));
 app.use("/api/ingrediant", require("./routes/ingrediantRoutes"));
 app.use("/api/type", require("./routes/typeRoutes"));
-app.use("/api/pack", require("./routes/packRoutes"));
+app.use("/api/extra", require("./routes/extraRoutes"));
 app.use("/api/history", require("./routes/historyRoutes"));
 app.use("/api/drink", require("./routes/drinkRoutes"));
 app.use("/api/uploads", express.static("uploads"));

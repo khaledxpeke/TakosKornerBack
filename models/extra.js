@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const packSchema = mongoose.Schema({
+const extraSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -24,4 +24,4 @@ const packSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Pack", packSchema);
+module.exports = mongoose.model("Extra", extraSchema);

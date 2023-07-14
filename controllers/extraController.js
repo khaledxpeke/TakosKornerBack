@@ -1,4 +1,4 @@
-const Pack = require("../models/pack");
+const Extra = require("../models/extra");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -10,7 +10,7 @@ const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
-exports.addPack = async (req, res, next) => {
+exports.addExtra = async (req, res, next) => {
 
   upload.single("image")(req, res, async (err) => {
     if (err) {
@@ -24,15 +24,15 @@ exports.addPack = async (req, res, next) => {
     const userId = req.user.user._id;
     const image = req.file?.path || "";
     try {
-      const pack = await Pack.create({
+      const extra = await Extra.create({
         name,
         image,
         price,
         currency,
         createdBy: userId,
       });
-      await pack.save();
-      res.status(201).json({pack,message:"formule créer avec succées"});
+      await extra.save();
+      res.status(201).json({extra,message:"extra créer avec succées"});
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",
@@ -42,87 +42,87 @@ exports.addPack = async (req, res, next) => {
   });
 };
 
-exports.getPacks = async (req, res, next) => {
+exports.getExtras = async (req, res, next) => {
   try {
-    const packs = await Pack.find();
-    res.status(200).json(packs);
+    const extras = await Extra.find();
+    res.status(200).json(extras);
   } catch (error) {
     res.status(400).json({
-      message: "Aucune Formule trouvé",
+      message: "Aucune Extra trouvé",
       error: error.message,
     });
   }
 };
 
-exports.getPackById = async (req, res, next) => {
-  const { packId } = req.params;
+exports.getExtraById = async (req, res, next) => {
+  const { extraId } = req.params;
   try {
-    const pack = await Pack.findById(packId);
-    res.status(200).json(pack);
+    const extra = await Extra.findById(extraId);
+    res.status(200).json(extra);
   } catch (error) {
     res.status(400).json({
-      message: "Aucune Formule trouvé",
+      message: "Aucune Extra trouvé",
       error: error.message,
     });
   }
 };
 
-exports.updatePack = async (req, res) => {
-  const packId = req.params.packId;
+exports.updateExtra = async (req, res) => {
+  const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
     const { name, price,currency } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
     }
-    const pack = await Pack.findById(packId);
-    if (!pack) {
-      res.status(500).json({ message: "aucun Formule trouvée" });
+    const extra = await Extra.findById(extraId);
+    if (!extra) {
+      res.status(500).json({ message: "aucun Extra trouvée" });
     }
     if (req.file) {
-      if (pack.image) {
-        fs.unlinkSync(pack.image);
+      if (extra.image) {
+        fs.unlinkSync(extra.image);
       }
-      pack.image = req.file.path;
+      extra.image = req.file.path;
     }
     try {
-      const updatedpack = await Pack.findByIdAndUpdate(packId, {
-        name: name || pack.name,
-        price: price || pack.price,
-        currency: currency || pack.currency,
-        image: pack.image, 
+      const updatedextra = await Extra.findByIdAndUpdate(extraId, {
+        name: name || extra.name,
+        price: price || extra.price,
+        currency: currency || extra.currency,
+        image: extra.image, 
       });
 
       res
         .status(200)
-        .json({ message: "Formule modifiéer avec succées" });
+        .json({ message: "Extra modifiéer avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   });
 };
 
-exports.deletePack = async (req, res, next) => {
-  const { packId } = req.params;
+exports.deleteExtra = async (req, res, next) => {
+  const { extraId } = req.params;
   try {
-    const pack = await Pack.findById(packId);
-    if (!pack) {
+    const extra = await Extra.findById(extraId);
+    if (!extra) {
       return res.status(404).json({
-        message: "il n'y a pas de formule avec cet id",
+        message: "il n'y a pas de extra avec cet id",
       });
     }
-    if (pack.image) {
-      fs.unlink(pack.image, (err) => {
+    if (extra.image) {
+      fs.unlink(extra.image, (err) => {
         if (err) {
           res.status(500).json({
-            message: "Aucune Formule image trouvé",
+            message: "Aucune extra image trouvé",
           });
         }
       });
     }
-    await Pack.findByIdAndDelete(pack);
+    await Extra.findByIdAndDelete(extra);
     res.status(200).json({
-      message: "Formule supprimer avec succées",
+      message: "Extra supprimer avec succées",
     });
   } catch (error) {
     res.status(400).json({
