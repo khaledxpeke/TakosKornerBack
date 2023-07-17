@@ -25,9 +25,21 @@ const ingrediantSchema = mongoose.Schema({
   },
   currency: {
     type: String,
+    validate: {
+      validator: function () {
+        return !this.currency || this.price; // Require currency only if price is provided
+      },
+      message: "Currency is required when price is provided",
+    },
   },
   price: {
     type: Number,
+    validate: {
+      validator: function () {
+        return !this.price || this.currency; // Require price only if currency is provided
+      },
+      message: "Price is required when currency is provided",
+    },
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

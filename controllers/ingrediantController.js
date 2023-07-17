@@ -144,7 +144,7 @@ exports.getAllIngrediants = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, type } = req.body;
+    const { name, type,price, currency } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -162,6 +162,12 @@ exports.updateIngrediant = async (req, res) => {
     try {
       ingrediant.name = name || ingrediant.name;
       ingrediant.type = type || ingrediant.type;
+      if (price !== undefined) {
+        ingrediant.price = price !== "" ? price : null;
+      }
+      if (currency !== undefined) {
+        ingrediant.currency = currency !== "" ? currency : null;
+      }
       const updatedIngrediant = await ingrediant.save();
 
       const products = await Product.find({ ingrediants: ingrediantId });
