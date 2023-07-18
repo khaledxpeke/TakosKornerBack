@@ -1,5 +1,6 @@
 const Ingrediant = require("../models/ingrediant");
 const Product = require("../models/product");
+const Type = require("../models/type");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
@@ -133,6 +134,34 @@ exports.getAllIngrediants = async (req, res, next) => {
   try {
     const ingrediants = await Ingrediant.find().populate("type");
     res.status(200).json(ingrediants);
+  } catch (error) {
+    res.status(400).json({
+      message: "Aucun ingrediant trouvé",
+      error: error.message,
+    });
+  }
+};
+exports.getAllIngrediantsByType = async (req, res, next) => {
+  try {
+    const ingrediants = await Ingrediant.find({}, { _id: 1, name: 1 }).populate(
+      "type",
+      { name: 1 }
+    );
+    
+    // Group ingredients by type name
+    const ingrediantsByType = {};
+    ingrediants.forEach((ingrediant) => {
+      const { type } = ingrediant;
+      if (type) {
+        const { name } = type;
+        if (!ingrediantsByType[name]) {
+          ingrediantsByType[name] = [];
+        }
+        ingrediantsByType[name].push({ _id: ingrediant._id, name: ingrediant.name });
+      }
+    });
+    
+    res.status(200).json(ingrediantsByType);
   } catch (error) {
     res.status(400).json({
       message: "Aucun ingrediant trouvé",
