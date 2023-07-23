@@ -25,7 +25,7 @@ exports.addDesert = async (req, res, next) => {
       });
     }
 
-    const { name, price,currency } = req.body;
+    const { name, price,currency,max } = req.body;
     const image = req.file.path;
     try {
       const deserts = await Desert.create({
@@ -33,6 +33,7 @@ exports.addDesert = async (req, res, next) => {
         price,
         image,
         currency,
+        max,
       });
       res.status(201).json({
         deserts,message:"Dessert créer avec succées"
@@ -101,7 +102,7 @@ exports.deleteDesert = async (req, res, next) => {
 exports.updateDesert = async (req, res) => {
   const desertId = req.params.desertId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,currency } = req.body;
+    const { name,price,currency,max } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -121,6 +122,7 @@ exports.updateDesert = async (req, res) => {
         name: name || desert.name,
         price: price || desert.price,
         currency: currency || desert.currency,
+        max: max || desert.max,
         image: desert.image, 
       });
 

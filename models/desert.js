@@ -22,6 +22,10 @@ const desertSchema = mongoose.Schema({
   currency: {
     type: String,
   },
+  max: {
+    type: Number,
+    default: 1,
+  },
 });
 
 module.exports = mongoose.model("Desert", desertSchema);

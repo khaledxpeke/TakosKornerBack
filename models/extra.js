@@ -17,6 +17,10 @@ const extraSchema = mongoose.Schema({
   currency: {
     type: String,
   },
+  max: {
+    type: Number,
+    default: 1,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
