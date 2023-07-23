@@ -8,6 +8,10 @@ const typeSchema = mongoose.Schema({
     message: {
       type: String,
     },
+    max: {
+      type: Number,
+      default: 1,
+    },
   });
   
   module.exports = mongoose.model("Type", typeSchema);
