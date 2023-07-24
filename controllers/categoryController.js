@@ -57,7 +57,7 @@ exports.getAllCategories = async (req, res) => {
           populate: { path: "type", select: "name message max" },
         },
         { path: "supplements", select: "name image price currency" },
-        { path: "type", select: "name message" },
+        { path: "type", select: "name message max" },
       ],
     });
     res.status(200).json(categories);
