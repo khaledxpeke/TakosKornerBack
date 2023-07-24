@@ -157,7 +157,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
         if (!ingrediantsByType[name]) {
           ingrediantsByType[name] = [];
         }
-        ingrediantsByType[name].push({ _id: ingrediant._id, name: ingrediant.name });
+        ingrediantsByType[name].push({ _id: ingrediant._id, name: ingrediant.name,type:ingrediant.type });
       }
     });
     

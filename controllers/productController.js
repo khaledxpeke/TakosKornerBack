@@ -33,8 +33,9 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, type, maxIngrediant, choice } = req.body;
+    const { currency, maxIngrediant, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
+    const typeIds = req.body.type?.split(",") || [];
     const supplementIds = req.body.supplements?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
@@ -49,7 +50,7 @@ exports.addProductToCategory = async (req, res, next) => {
           price,
           category: categoryId,
           currency,
-          type: [],
+          type: typeIds,
           createdBy: userId,
           maxIngrediant,
           ingrediants: ingrediantIds,
@@ -65,17 +66,17 @@ exports.addProductToCategory = async (req, res, next) => {
             return await Ingrediant.findById(ingrediant);
           })
         );
-        const types = productIngrediants.map((ingrediant) => ingrediant.type);
-        const uniqueTypes = types.reduce((unique, current) => {
-          const isDuplicate = unique.some(
-            (obj) => obj.valueOf() === current.valueOf()
-          );
-          if (!isDuplicate) {
-            unique.push(current);
-          }
-          return unique;
-        }, []);
-        product.type = uniqueTypes;
+        // const types = productIngrediants.map((ingrediant) => ingrediant.type);
+        // const uniqueTypes = types.reduce((unique, current) => {
+        //   const isDuplicate = unique.some(
+        //     (obj) => obj.valueOf() === current.valueOf()
+        //   );
+        //   if (!isDuplicate) {
+        //     unique.push(current);
+        //   }
+        //   return unique;
+        // }, []);
+        // product.type = uniqueTypes;
 
         // Save the product
         const savedProduct = await product.save();
@@ -85,10 +86,10 @@ exports.addProductToCategory = async (req, res, next) => {
           { $push: { products: savedProduct._id } },
           { new: true }
         );
-        await Product.updateMany(
-          { type: { $in: uniqueTypes } },
-          { $push: { product: savedProduct._id } }
-        );
+        // await Product.updateMany(
+        //   { type: { $in: typeIds } },
+        //   { $push: { product: savedProduct._id } }
+        // );
         await Ingrediant.updateMany(
           { _id: { $in: ingrediantIds } },
           { $push: { product: savedProduct._id } }
