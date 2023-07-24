@@ -235,17 +235,17 @@ exports.updateProduct = async (req, res) => {
           return await Ingrediant.findById(ingrediant);
         })
       );
-      const types = productIngrediants.map((ingrediant) => ingrediant.type);
-      const uniqueTypes = types.reduce((unique, current) => {
-        const isDuplicate = unique.some(
-          (obj) => obj.valueOf() === current.valueOf()
-        );
-        if (!isDuplicate) {
-          unique.push(current);
-        }
-        return unique;
-      }, []);
-      await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
+      // const types = productIngrediants.map((ingrediant) => ingrediant.type);
+      // const uniqueTypes = types.reduce((unique, current) => {
+      //   const isDuplicate = unique.some(
+      //     (obj) => obj.valueOf() === current.valueOf()
+      //   );
+      //   if (!isDuplicate) {
+      //     unique.push(current);
+      //   }
+      //   return unique;
+      // }, []);
+      // await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
       await Category.findByIdAndUpdate(product.category, {
         $pull: { products: productId },
       });
