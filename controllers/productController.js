@@ -126,7 +126,7 @@ exports.getProductsByCategory = async (req, res, next) => {
 };
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).populate({ path: "type" ,select: "name" });
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({
