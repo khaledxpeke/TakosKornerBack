@@ -35,7 +35,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const image = req.file.path; // Get the image file path from the request
     const { currency, maxIngrediant, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
-    const typeIds = req.body.type?.split(",") || [];
+    const typeIds = req.body.type || [];
     const supplementIds = req.body.supplements?.split(",") || [];
     try {
       let product = await Product.findOne({ name });
