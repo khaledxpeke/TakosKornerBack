@@ -182,6 +182,7 @@ exports.updateProduct = async (req, res) => {
       ingrediants,
       category,
       choice,
+      type,
     } = req.body;
     if (err) {
       console.log(err);
@@ -202,6 +203,11 @@ exports.updateProduct = async (req, res) => {
     } else {
       product.supplements = [];
     }
+    if (type) {
+      product.type = req.body.type;
+    } else {
+      product.type = [];
+    }
     if (ingrediants) {
       product.ingrediants = ingrediants.split(",");
     } else {
@@ -212,6 +218,7 @@ exports.updateProduct = async (req, res) => {
         name: name || product.name,
         price: price || product.price,
         supplements: product.supplements,
+        type: product.type,
         currency: currency || product.currency,
         category: category,
         ingrediants: product.ingrediants,
