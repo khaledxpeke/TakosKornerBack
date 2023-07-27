@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path; // Get the image file path from the request
-    const { currency, maxIngrediant, choice } = req.body;
+    const { currency, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || [];
     const supplementIds = req.body.supplements?.split(",") || [];
@@ -52,7 +52,6 @@ exports.addProductToCategory = async (req, res, next) => {
           currency,
           type: typeIds,
           createdBy: userId,
-          maxIngrediant,
           ingrediants: ingrediantIds,
           supplements: supplementIds,
           choice,
@@ -178,7 +177,6 @@ exports.updateProduct = async (req, res) => {
       price,
       currency,
       supplements,
-      maxIngrediant,
       ingrediants,
       category,
       choice,
@@ -222,7 +220,6 @@ exports.updateProduct = async (req, res) => {
         currency: currency || product.currency,
         category: category,
         ingrediants: product.ingrediants,
-        maxIngrediant: maxIngrediant || product.maxIngrediant,
         image: product.image,
         choice: choice || product.choice,
       });

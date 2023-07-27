@@ -35,9 +35,6 @@ const ProductSchema = new Mongoose.Schema({
     ref: "User",
     required: true,
   },
-  maxIngrediant: {
-    type: Number,
-  },
   choice: {
     type: String,
     default: "seul",
