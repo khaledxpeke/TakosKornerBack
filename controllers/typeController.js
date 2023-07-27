@@ -7,7 +7,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
 exports.createType = async (req, res, next) => {
-  const { name,message,max } = req.body;
+  const { name,message,free ,quantity} = req.body;
 
   try {
     // Check if the type already exists
@@ -17,7 +17,7 @@ exports.createType = async (req, res, next) => {
     }
 
     // Create a new type
-    const newType = new Type({ name ,message,max});
+    const newType = new Type({ name ,message,free ,quantity});
     await newType.save();
 
     res.status(201).json({ message: "Type créer avec succées" });
@@ -56,8 +56,8 @@ exports.getTypeById = async (req, res, next) => {
 exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
-    const { name ,message,max} = req.body;
-    const type = await Type.findByIdAndUpdate(typeId, { name,message,max });
+    const { name ,message,free, quantity} = req.body;
+    const type = await Type.findByIdAndUpdate(typeId, { name,message,free,quantity });
     res.status(200).json({message:"Type modifié avec succées"});
   } catch (error) {
     res.status(400).json({

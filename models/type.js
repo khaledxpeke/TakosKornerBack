@@ -8,7 +8,11 @@ const typeSchema = mongoose.Schema({
     message: {
       type: String,
     },
-    max: {
+    free: {
+      type: Number,
+      default: 1,
+    },
+    quantity: {
       type: Number,
       default: 1,
     },
