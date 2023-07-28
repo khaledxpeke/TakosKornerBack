@@ -80,8 +80,13 @@ exports.deleteType = async (req, res, next) => {
     }
 
     const ingredients = await Ingrediant.find({ type: typeId });
-    for (const ingredient of ingredients) {
 
+    await Product.updateMany(
+      { ingrediants: { $in: ingredients.map((ingredient) => ingredient._id) } },
+      { $pull: { ingrediants: { $in: ingredients.map((ingredient) => ingredient._id) } } }
+    );
+
+    for (const ingredient of ingredients) {
       if (ingredient.image) {
         const imagePath = path.join(__dirname, '..', ingredient.image);
         fs.unlinkSync(imagePath);
