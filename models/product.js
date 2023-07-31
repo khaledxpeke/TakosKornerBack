@@ -41,6 +41,10 @@ const ProductSchema = new Mongoose.Schema({
     enum: ["seul", "multiple"],
     required: true,
   },
+  rules : [{
+    type: Mongoose.Schema.Types.ObjectId,
+    ref: "Rule",
+  }],
 });
 
 const Product = Mongoose.model("Product", ProductSchema);

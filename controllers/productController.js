@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const Rule = require("../models/rules");
 const Category = require("../models/category");
 const Ingrediant = require("../models/ingrediant");
 const express = require("express");
@@ -9,7 +10,6 @@ const jwtSecret = process.env.JWT_SECRET;
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 app.use(express.json());
-// Set up multer upload middleware with the imported storage configuration
 const upload = multer({ storage: multerStorage });
 const fs = require("fs");
 
@@ -32,11 +32,13 @@ exports.addProductToCategory = async (req, res, next) => {
     const userId = req.user.user._id;
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
-    const image = req.file.path; // Get the image file path from the request
+    const image = req.file.path; 
     const { currency, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || [];
+    const rules = JSON.parse(req.body.rules) || [];
     const supplementIds = req.body.supplements?.split(",") || [];
+    const rulesIds = [];
     try {
       let product = await Product.findOne({ name });
 
@@ -45,12 +47,22 @@ exports.addProductToCategory = async (req, res, next) => {
           message: "Produit existe déja",
         });
       } else {
+        for (const ruleData of rules) {
+          try {
+            const rule = new Rule(ruleData);
+          const savedRule = await rule.save();
+            rulesIds.push(savedRule._id); 
+          } catch (error) {
+            console.error('Error saving rule:', error);
+          }
+        }
         const product = new Product({
           name,
           price,
           category: categoryId,
           currency,
           type: typeIds,
+          rules: rulesIds,
           createdBy: userId,
           ingrediants: ingrediantIds,
           supplements: supplementIds,
@@ -247,7 +259,6 @@ exports.updateProduct = async (req, res) => {
         $pull: { products: productId },
       });
 
-      // Add the product to the new category
       await Category.findByIdAndUpdate(category, {
         $addToSet: { products: productId },
       });
