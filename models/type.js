@@ -16,6 +16,13 @@ const typeSchema = mongoose.Schema({
       type: Number,
       default: 1,
     },
+    currency: {
+      type: String,
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
   });
   
   module.exports = mongoose.model("Type", typeSchema);

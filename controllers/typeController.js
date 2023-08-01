@@ -7,11 +7,11 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 exports.createType = async (req, res, next) => {
-  const { name,message,free ,quantity} = req.body;
+  const { name, message, free, quantity, price, currency } = req.body;
 
   try {
     // Check if the type already exists
@@ -21,7 +21,14 @@ exports.createType = async (req, res, next) => {
     }
 
     // Create a new type
-    const newType = new Type({ name ,message,free ,quantity});
+    const newType = new Type({
+      name,
+      message,
+      free,
+      quantity,
+      price,
+      currency,
+    });
     await newType.save();
 
     res.status(201).json({ message: "Type créer avec succées" });
@@ -60,9 +67,21 @@ exports.getTypeById = async (req, res, next) => {
 exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
-    const { name ,message,free, quantity} = req.body;
-    const type = await Type.findByIdAndUpdate(typeId, { name,message,free,quantity });
-    res.status(200).json({message:"Type modifié avec succées"});
+    const { name, message, free, quantity,price,currency } = req.body;
+    const type = await Type.findById(typeId);
+    if (!type) {
+      res.status(500).json({ message: "aucun Type trouvée" });
+    }
+    const updatedType = await Type.findByIdAndUpdate(typeId, {
+      name,
+      message,
+      free,
+      quantity,
+      price: price || type.price,
+      currency: currency || type.currency,
+    });
+
+    res.status(200).json({ message: "Type modifié avec succées" });
   } catch (error) {
     res.status(400).json({
       message: "some error occured",
@@ -83,22 +102,23 @@ exports.deleteType = async (req, res, next) => {
 
     await Product.updateMany(
       { ingrediants: { $in: ingredients.map((ingredient) => ingredient._id) } },
-      { $pull: { ingrediants: { $in: ingredients.map((ingredient) => ingredient._id) } } }
+      {
+        $pull: {
+          ingrediants: { $in: ingredients.map((ingredient) => ingredient._id) },
+        },
+      }
     );
 
     for (const ingredient of ingredients) {
       if (ingredient.image) {
-        const imagePath = path.join(__dirname, '..', ingredient.image);
+        const imagePath = path.join(__dirname, "..", ingredient.image);
         fs.unlinkSync(imagePath);
       }
     }
     await Type.findByIdAndDelete(typeId);
     await Ingrediant.deleteMany({ type: typeId });
 
-    await Product.updateMany(
-      { type: typeId },
-      { $pull: { type: typeId } }
-    );
+    await Product.updateMany({ type: typeId }, { $pull: { type: typeId } });
     res.status(200).json({ message: "Type supprimer avec succées" });
   } catch (error) {
     res.status(400).json({
