@@ -1,6 +1,5 @@
 const Supplement = require("../models/supplement");
 const Product = require("../models/product");
-const ProductSupplement = require("../models/ProductSupplement");
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");

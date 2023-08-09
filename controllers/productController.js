@@ -32,7 +32,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const userId = req.user.user._id;
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
-    const image = req.file.path; 
+    const image = req.file.path;
     const { currency, choice } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || [];
@@ -50,10 +50,10 @@ exports.addProductToCategory = async (req, res, next) => {
         for (const ruleData of rules) {
           try {
             const rule = new Rule(ruleData);
-          const savedRule = await rule.save();
-            rulesIds.push(savedRule._id); 
+            const savedRule = await rule.save();
+            rulesIds.push(savedRule._id);
           } catch (error) {
-            console.error('Error saving rule:', error);
+            console.error("Error saving rule:", error);
           }
         }
         const product = new Product({
@@ -137,7 +137,21 @@ exports.getProductsByCategory = async (req, res, next) => {
 };
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({}).populate({ path: "type" ,select: "name" });
+    const products = await Product.find({}).populate([
+      {
+        path: "type",
+        select: "name",
+      },
+      {
+        path: "rules",
+        select: "type numberOfFree maxIngrediant",
+      },
+      {
+        path: "ingrediants",
+        select: "name",
+        populate: { path: "type", select: "name" },
+      },
+    ]);
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({
@@ -192,79 +206,63 @@ exports.updateProduct = async (req, res) => {
       ingrediants,
       category,
       choice,
+      rules,
       type,
     } = req.body;
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Server error" });
-    }
-    const product = await Product.findById(productId);
-    if (!product) {
-      res.status(500).json({ message: "aucun produit trouvée" });
-    }
-    if (req.file) {
-      if (product.image) {
-        fs.unlinkSync(product.image);
-      }
-      product.image = req.file.path;
-    }
-    if (supplements) {
-      product.supplements = req.body.supplements.split(",");
-    } else {
-      product.supplements = [];
-    }
-    if (type) {
-      product.type = req.body.type;
-    } else {
-      product.type = [];
-    }
-    if (ingrediants) {
-      product.ingrediants = ingrediants.split(",");
-    } else {
-      product.ingrediants = [];
-    }
-    try {
-      const updatedproduct = await Product.findByIdAndUpdate(productId, {
-        name: name || product.name,
-        price: price || product.price,
-        supplements: product.supplements,
-        type: product.type,
-        currency: currency || product.currency,
-        category: category,
-        ingrediants: product.ingrediants,
-        image: product.image,
-        choice: choice || product.choice,
-      });
-      let updatedIngrediants = [];
-      if (ingrediants !== undefined) {
-        updatedIngrediants = ingrediants.split(",");
-      }
-      const productIngrediants = await Promise.all(
-        updatedIngrediants.map(async (ingrediant) => {
-          return await Ingrediant.findById(ingrediant);
-        })
-      );
-      // const types = productIngrediants.map((ingrediant) => ingrediant.type);
-      // const uniqueTypes = types.reduce((unique, current) => {
-      //   const isDuplicate = unique.some(
-      //     (obj) => obj.valueOf() === current.valueOf()
-      //   );
-      //   if (!isDuplicate) {
-      //     unique.push(current);
-      //   }
-      //   return unique;
-      // }, []);
-      // await Product.findByIdAndUpdate(productId, { type: uniqueTypes });
-      await Category.findByIdAndUpdate(product.category, {
-        $pull: { products: productId },
-      });
 
-      await Category.findByIdAndUpdate(category, {
-        $addToSet: { products: productId },
-      });
-      res.status(200).json({ message: "Produit modifié avec succées" });
+    try {
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (req.file) {
+        if (product.image) {
+          fs.unlinkSync(product.image);
+        }
+        product.image = req.file.path;
+      }
+
+      product.name = name || product.name;
+      product.price = price || product.price;
+      product.currency = currency || product.currency;
+      product.category = category || product.category;
+      product.choice = choice || product.choice;
+
+      product.supplements = supplements ? supplements.split(",") : [];
+
+      product.ingrediants = ingrediants ? ingrediants.split(",") : [];
+      product.type = type ? type.split(",") : [];
+
+      if (rules) {
+        const updatedRules = rules.map((rule) => {
+          return {
+            type: rule.type,
+            numberOfFree: rule.numberOfFree || 1, 
+            maxIngrediant: rule.maxIngrediant || 1, 
+          };
+        });
+        const savedRules = await Promise.all(
+          updatedRules.map(async (rule) => {
+            if (rule._id) {
+              return await Rule.findByIdAndUpdate(rule._id, rule, {
+                new: true,
+              });
+            } else {
+              const newRule = new Rule(rule);
+              return await newRule.save();
+            }
+          })
+        );
+        const rulesIds = savedRules.map((rule) => rule._id);
+        product.rules = rulesIds;
+      }
+      await product.save();
+
+      res.status(200).json({ message: "Product updated successfully" });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.log(error);
+      res.status(500).json({ message: "Server error" });
     }
   });
 };
