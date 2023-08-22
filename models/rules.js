@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const ruleSchema = mongoose.Schema({
-  numberOfFree: {
+  free: {
     type: Number,
     default: 1,
   },
-  maxIngrediant: {
+  quantity: {
     type: Number,
     default: 1,
   },

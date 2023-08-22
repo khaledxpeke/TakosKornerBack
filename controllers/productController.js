@@ -144,7 +144,7 @@ exports.getAllProducts = async (req, res, next) => {
       },
       {
         path: "rules",
-        select: "type numberOfFree maxIngrediant",
+        select: "type free quantity",
       },
       {
         path: "ingrediants",
@@ -239,8 +239,8 @@ exports.updateProduct = async (req, res) => {
           return {
             _id: rule._id,
             type: rule.type,
-            numberOfFree: rule.numberOfFree || 1,
-            maxIngrediant: rule.maxIngrediant || 1,
+            free: rule.free || 1,
+            quantity: rule.quantity || 1,
           };
         });
         product.rules = updatedRules.map(rule => rule._id);
