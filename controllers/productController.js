@@ -237,26 +237,20 @@ exports.updateProduct = async (req, res) => {
       if (rules) {
         const updatedRules = rules.map((rule) => {
           return {
+            _id: rule._id,
             type: rule.type,
-            numberOfFree: rule.numberOfFree || 1, 
-            maxIngrediant: rule.maxIngrediant || 1, 
+            numberOfFree: rule.numberOfFree || 1,
+            maxIngrediant: rule.maxIngrediant || 1,
           };
         });
-        const savedRules = await Promise.all(
+        product.rules = updatedRules.map(rule => rule._id);
+        await Promise.all(
           updatedRules.map(async (rule) => {
-            if (rule._id) {
-              return await Rule.findByIdAndUpdate(rule._id, rule, {
-                new: true,
-              });
-            } else {
-              const newRule = new Rule(rule);
-              return await newRule.save();
-            }
+            await Rule.findByIdAndUpdate(rule._id, rule, { new: true });
           })
         );
-        const rulesIds = savedRules.map((rule) => rule._id);
-        product.rules = rulesIds;
       }
+
       await product.save();
 
       res.status(200).json({ message: "Product updated successfully" });
