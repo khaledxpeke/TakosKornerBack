@@ -58,6 +58,11 @@ exports.getAllCategories = async (req, res) => {
         },
         { path: "supplements", select: "name image price currency" },
         { path: "type", select: "name message free quantity price currency" },
+        {
+          path: "rules",
+          select: "free quantity",
+          populate: { path: "type", select: "name" },
+        },
       ],
     });
     res.status(200).json(categories);
