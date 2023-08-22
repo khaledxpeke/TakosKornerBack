@@ -17,6 +17,15 @@ const historySchema = mongoose.Schema({
           image: { type: String },
         },
       ],
+      extras: [
+        {
+          _id: { type: String, required: true },
+          name: { type: String, required: true },
+          currency: { type: String },
+          price: { type: Number },
+          image: { type: String },
+        },
+      ],
     },
   ],
   pack: {

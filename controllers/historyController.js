@@ -14,6 +14,7 @@ exports.addHistory = async (req, res) => {
     product: decodedList.map((product) => ({
       plat: product.plat,
       addons: product.addons,
+      extras: product.extras,
     })),
     pack,
     total,
@@ -53,11 +54,10 @@ exports.getLast10Orders = async (req, res) => {
     const orders = await History.find()
       .sort({ boughtAt: -1 })
       .limit(10)
-      .populate("product.plat"); // Populate the "plat" field with the referenced "Product" document
+      .populate("product.plat"); 
 
     res.status(200).json(orders);
   } catch (error) {
-    // Handle the error
     res.status(500).json({ message: error.message });
     throw error;
   }
