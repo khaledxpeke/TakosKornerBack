@@ -8,14 +8,6 @@ const typeSchema = mongoose.Schema({
     message: {
       type: String,
     },
-    free: {
-      type: Number,
-      default: 1,
-    },
-    quantity: {
-      type: Number,
-      default: 1,
-    },
     currency: {
       type: String,
     },
@@ -23,6 +15,10 @@ const typeSchema = mongoose.Schema({
       type: Number,
       default: 0,
     },
+    isRequired: {
+      type: Boolean,
+      default: false,
+    }
   });
   
   module.exports = mongoose.model("Type", typeSchema);

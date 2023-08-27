@@ -235,25 +235,41 @@ exports.updateProduct = async (req, res) => {
       product.type = type ? type.split(",") : [];
 
       if (rules) {
-        const updatedRules = rules.map((rule) => {
-          return {
-            _id: rule._id,
-            type: rule.type,
-            free: rule.free || 1,
-            quantity: rule.quantity || 1,
-          };
-        });
-        product.rules = updatedRules.map(rule => rule._id);
+        const updatedRules = await Promise.all(
+          rules.map(async (rule) => {
+            if (rule._id) {
+              return {
+                _id: rule._id,
+                type: rule.type,
+                free: rule.free || 1,
+                quantity: rule.quantity || 1,
+              };
+            } else {
+              const newRule = new Rule(rule);
+              const returnedRule = await newRule.save();
+              return await returnedRule;
+            }
+          })
+        );
+        const removedRuleIds = product.rules.filter(
+          (existingRuleId) =>
+            !updatedRules.some((updatedRule) => updatedRule._id.toString() === existingRuleId.toString())
+        );
+      
+        await Rule.deleteMany({ _id: { $in: removedRuleIds } });
+        product.rules = updatedRules.map((rule) => rule._id);
         await Promise.all(
           updatedRules.map(async (rule) => {
-            await Rule.findByIdAndUpdate(rule._id, rule, { new: true });
+            await Rule.findByIdAndUpdate(rule._id, rule);
           })
         );
       }
+   
+      const updatedProduct = await product.save();
 
-      await product.save();
-
-      res.status(200).json({ message: "Product updated successfully" });
+      res
+        .status(200)
+        .json({ updatedProduct, message: "Product updated successfully" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Server error" });

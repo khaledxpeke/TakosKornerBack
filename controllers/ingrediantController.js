@@ -28,16 +28,24 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeId} = req.body;
+    const { name, typeId,price,currency} = req.body;
     const userId = req.user.user._id;
     const image = req.file.path;
     try {
+      const nameAlreadyExist = await Ingrediant.findOne({ name });
+      if (nameAlreadyExist) {
+        return res.status(400).json({ message: "Ingrediant déja existant" });
+      }
       const ingredient = await Ingrediant.create({
         name,
         image,
         type: typeId,
         createdBy: userId,
       });
+      if (price && currency) {
+        ingredient.price = price;
+        ingredient.currency = currency;
+      }
       await ingredient.save();
       res
         .status(201)
@@ -169,7 +177,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, type } = req.body;
+    const { name, type,price, currency } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -185,8 +193,15 @@ exports.updateIngrediant = async (req, res) => {
       ingrediant.image = req.file.path;
     }
     try {
+      
       ingrediant.name = name || ingrediant.name;
       ingrediant.type = type || ingrediant.type;
+      if (price !== undefined) {
+        ingrediant.price = price !== "" ? price : null;
+      }
+      if (currency !== undefined) {
+        ingrediant.currency = currency !== "" ? currency : null;
+      }
       const updatedIngrediant = await ingrediant.save();
 
       const products = await Product.find({ ingrediants: ingrediantId });

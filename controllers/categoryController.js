@@ -54,10 +54,10 @@ exports.getAllCategories = async (req, res) => {
         {
           path: "ingrediants",
           select: "name image",
-          populate: { path: "type", select: "name message free quantity price currency" },
+          populate: { path: "type", select: "name message price currency" },
         },
         { path: "supplements", select: "name image price currency" },
-        { path: "type", select: "name message free quantity price currency" },
+        { path: "type", select: "name message price currency" },
         {
           path: "rules",
           select: "free quantity",
