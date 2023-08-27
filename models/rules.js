@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ruleSchema = mongoose.Schema({
   free: {
     type: Number,
-    default: 1,
+    default: 0,
   },
   quantity: {
     type: Number,
