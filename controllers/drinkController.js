@@ -25,14 +25,13 @@ exports.addDrink = async (req, res, next) => {
       });
     }
 
-    const { name, price,currency,max } = req.body;
+    const { name, price,max } = req.body;
     const image = req.file.path;
     try {
       const drinks = await Drink.create({
         name,
         price,
         image,
-        currency,
         max,
       });
       res.status(201).json({
@@ -102,7 +101,7 @@ exports.deleteDrink = async (req, res, next) => {
 exports.updateDrink = async (req, res) => {
   const drinkId = req.params.drinkId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,currency,max } = req.body;
+    const { name,price,max } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -121,7 +120,6 @@ exports.updateDrink = async (req, res) => {
       const updatedDrink = await Drink.findByIdAndUpdate(drinkId, {
         name: name || drink.name,
         price: price || drink.price,
-        currency: currency || drink.currency,
         max: max || drink.max,
         image: drink.image, 
       });

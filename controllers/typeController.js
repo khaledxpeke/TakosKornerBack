@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 
 exports.createType = async (req, res, next) => {
-  const { name, message, price, currency,isRequired } = req.body;
+  const { name, message, price,isRequired } = req.body;
 
   try {
     // Check if the type already exists
@@ -25,7 +25,6 @@ exports.createType = async (req, res, next) => {
       name,
       message,
       price,
-      currency,
       isRequired
     });
     await newType.save();
@@ -66,7 +65,7 @@ exports.getTypeById = async (req, res, next) => {
 exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
-    const { name, message,price,currency,isRequired } = req.body;
+    const { name, message,price,isRequired } = req.body;
     const type = await Type.findById(typeId);
     if (!type) {
       res.status(500).json({ message: "aucun Type trouvée" });
@@ -76,7 +75,6 @@ exports.updateType = async (req, res, next) => {
       message,
       isRequired,
       price: price || type.price,
-      currency: currency || type.currency,
     });
 
     res.status(200).json({ message: "Type modifié avec succées" });

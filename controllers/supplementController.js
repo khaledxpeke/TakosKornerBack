@@ -26,7 +26,7 @@ exports.createSupplement = async (req, res, next) => {
       });
     }
 
-    const { name, price, currency } = req.body;
+    const { name, price } = req.body;
     const userId = req.user.user._id;
     const image = req.file.path;
     try {
@@ -34,7 +34,6 @@ exports.createSupplement = async (req, res, next) => {
         name,
         price,
         image,
-        currency,
         createdBy: userId,
       });
       res.status(201).json({
@@ -171,7 +170,7 @@ exports.deleteSupplement = async (req, res, next) => {
 exports.updateSupplement = async (req, res) => {
   const supplementId = req.params.supplementId;
   upload.single("image")(req, res, async (err) => {
-    const { name,type,price,currency } = req.body;
+    const { name,type,price } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -190,7 +189,6 @@ exports.updateSupplement = async (req, res) => {
       const updatedsupplement = await Supplement.findByIdAndUpdate(supplementId, {
         name: name || supplement.name,
         price: price || supplement.price,
-        currency: currency || supplement.currency,
         image: supplement.image,
         type: type|| supplement.type,  
       });

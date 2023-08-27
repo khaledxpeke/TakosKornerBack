@@ -6,10 +6,6 @@ const supplementSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
-  currency: {
-    type: String,
-    required: true,
-  },
   price: {
     type: Number,
     required: true,

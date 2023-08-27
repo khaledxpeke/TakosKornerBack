@@ -14,9 +14,6 @@ const extraSchema = mongoose.Schema({
   price: {
     type: Number,
   },
-  currency: {
-    type: String,
-  },
   max: {
     type: Number,
     default: 1,

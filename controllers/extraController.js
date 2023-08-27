@@ -20,7 +20,7 @@ exports.addExtra = async (req, res, next) => {
       });
     }
 
-    const { name, price, currency,max } = req.body;
+    const { name, price,max } = req.body;
     const userId = req.user.user._id;
     const image = req.file?.path || "";
     try {
@@ -28,7 +28,6 @@ exports.addExtra = async (req, res, next) => {
         name,
         image,
         price,
-        currency,
         max,
         createdBy: userId,
       });
@@ -71,7 +70,7 @@ exports.getExtraById = async (req, res, next) => {
 exports.updateExtra = async (req, res) => {
   const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price,currency,max } = req.body;
+    const { name, price,max } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -90,7 +89,6 @@ exports.updateExtra = async (req, res) => {
       const updatedextra = await Extra.findByIdAndUpdate(extraId, {
         name: name || extra.name,
         price: price || extra.price,
-        currency: currency || extra.currency,
         max: max || extra.max,
         image: extra.image, 
       });
