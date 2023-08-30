@@ -68,7 +68,7 @@ exports.getExtraById = async (req, res, next) => {
 exports.updateExtra = async (req, res) => {
   const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price, max } = req.body;
+    const { name, price } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
