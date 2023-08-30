@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = req.file.path;
-    const { currency, choice } = req.body;
+    const { currency, choice, maxExtras, maxDessert, maxDrink } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || [];
     const rules = JSON.parse(req.body.rules) || [];
@@ -68,10 +68,20 @@ exports.addProductToCategory = async (req, res, next) => {
           supplements: supplementIds,
           choice,
         });
+        if (maxExtras) {
+          product.maxExtras = maxExtras;
+        }
+        if (maxDessert) {
+          product.maxDessert = maxDessert;
+        }
+        if (maxDrink) {
+          product.maxDrink = maxDrink;
+        }
         if (image) {
           product.image = image;
           await product.save();
         }
+
         const productIngrediants = await Promise.all(
           ingrediantIds.map(async (ingrediant) => {
             return await Ingrediant.findById(ingrediant);
@@ -208,6 +218,9 @@ exports.updateProduct = async (req, res) => {
       choice,
       rules,
       type,
+      maxExtras,
+      maxDessert,
+      maxDrink,
     } = req.body;
 
     try {
@@ -228,6 +241,9 @@ exports.updateProduct = async (req, res) => {
       product.currency = currency || product.currency;
       product.category = category || product.category;
       product.choice = choice || product.choice;
+      product.maxExtras = maxExtras || product.maxExtras;
+      product.maxDessert = maxDessert || product.maxDessert;
+      product.maxDrink = maxDrink || product.maxDrink;
 
       product.supplements = supplements ? supplements.split(",") : [];
 
@@ -253,9 +269,12 @@ exports.updateProduct = async (req, res) => {
         );
         const removedRuleIds = product.rules.filter(
           (existingRuleId) =>
-            !updatedRules.some((updatedRule) => updatedRule._id.toString() === existingRuleId.toString())
+            !updatedRules.some(
+              (updatedRule) =>
+                updatedRule._id.toString() === existingRuleId.toString()
+            )
         );
-      
+
         await Rule.deleteMany({ _id: { $in: removedRuleIds } });
         product.rules = updatedRules.map((rule) => rule._id);
         await Promise.all(
@@ -264,7 +283,7 @@ exports.updateProduct = async (req, res) => {
           })
         );
       }
-   
+
       const updatedProduct = await product.save();
 
       res

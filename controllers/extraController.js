@@ -11,7 +11,6 @@ const fs = require("fs");
 
 const upload = multer({ storage: multerStorage });
 exports.addExtra = async (req, res, next) => {
-
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
@@ -20,7 +19,7 @@ exports.addExtra = async (req, res, next) => {
       });
     }
 
-    const { name, price,max } = req.body;
+    const { name, price } = req.body;
     const userId = req.user.user._id;
     const image = req.file?.path || "";
     try {
@@ -28,11 +27,10 @@ exports.addExtra = async (req, res, next) => {
         name,
         image,
         price,
-        max,
         createdBy: userId,
       });
       await extra.save();
-      res.status(201).json({extra,message:"extra créer avec succées"});
+      res.status(201).json({ extra, message: "extra créer avec succées" });
     } catch (error) {
       res.status(400).json({
         message: "Some error occured",
@@ -70,7 +68,7 @@ exports.getExtraById = async (req, res, next) => {
 exports.updateExtra = async (req, res) => {
   const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price,max } = req.body;
+    const { name, price, max } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -89,13 +87,10 @@ exports.updateExtra = async (req, res) => {
       const updatedextra = await Extra.findByIdAndUpdate(extraId, {
         name: name || extra.name,
         price: price || extra.price,
-        max: max || extra.max,
-        image: extra.image, 
+        image: extra.image,
       });
 
-      res
-        .status(200)
-        .json({ message: "Extra modifiéer avec succées" });
+      res.status(200).json({ message: "Extra modifiéer avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

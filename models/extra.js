@@ -14,10 +14,6 @@ const extraSchema = mongoose.Schema({
   price: {
     type: Number,
   },
-  max: {
-    type: Number,
-    default: 1,
-  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

@@ -45,6 +45,15 @@ const ProductSchema = new Mongoose.Schema({
     type: Mongoose.Schema.Types.ObjectId,
     ref: "Rule",
   }],
+  maxExtras:{
+    type: Number,
+  },
+  maxDessert:{
+    type: Number,
+  },
+  maxDrink:{
+    type: Number,
+  },
 });
 
 const Product = Mongoose.model("Product", ProductSchema);
