@@ -12,7 +12,6 @@ const historySchema = mongoose.Schema({
         {
           _id: { type: String, required: true },
           name: { type: String, required: true },
-          currency: { type: String },
           price: { type: Number },
           image: { type: String },
         },
@@ -21,7 +20,6 @@ const historySchema = mongoose.Schema({
         {
           _id: { type: String, required: true },
           name: { type: String, required: true },
-          currency: { type: String },
           price: { type: Number },
           image: { type: String },
         },

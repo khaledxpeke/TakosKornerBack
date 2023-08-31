@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 
 exports.createType = async (req, res, next) => {
-  const { name, message, price,isRequired } = req.body;
+  const { name, message,isRequired } = req.body;
 
   try {
     // Check if the type already exists
@@ -24,7 +24,6 @@ exports.createType = async (req, res, next) => {
     const newType = new Type({
       name,
       message,
-      price,
       isRequired
     });
     await newType.save();

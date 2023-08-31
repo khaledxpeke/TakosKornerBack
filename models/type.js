@@ -8,10 +8,6 @@ const typeSchema = mongoose.Schema({
     message: {
       type: String,
     },
-    price: {
-      type: Number,
-      default: 0,
-    },
     isRequired: {
       type: Boolean,
       default: false,
