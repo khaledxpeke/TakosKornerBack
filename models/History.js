@@ -12,8 +12,9 @@ const historySchema = mongoose.Schema({
         {
           _id: { type: String, required: true },
           name: { type: String, required: true },
-          price: { type: Number },
-          image: { type: String },
+          count: { type: Number },
+          total: { type: Number },
+          pu: { type: Number },
         },
       ],
       extras: [
@@ -21,7 +22,6 @@ const historySchema = mongoose.Schema({
           _id: { type: String, required: true },
           name: { type: String, required: true },
           price: { type: Number },
-          image: { type: String },
         },
       ],
     },

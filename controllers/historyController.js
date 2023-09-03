@@ -19,15 +19,15 @@ exports.addHistory = async (req, res) => {
     pack,
     total,
   });
-  console.log('Before saving history:', history);
+  console.log("Before saving history:", history);
   history
     .save()
     .then((result) => {
-      console.log('History saved:', result);
+      console.log("History saved:", result);
       res.status(201).json(result);
     })
     .catch((err) => {
-      console.log('Error occurred while saving history:', err);
+      console.log("Error occurred while saving history:", err);
       res.status(500).json({
         message: "Some error occured",
         error: err,
@@ -36,26 +36,28 @@ exports.addHistory = async (req, res) => {
 };
 
 exports.getHistory = async (req, res) => {
-  const history = await History.find().sort({ boughtAt: -1 }).populate({
-    path: "product",
-    populate: [
-      {
-        path: "plat",
-        select: "name currency price",
-        populate: { path: "category", select: "name" },
-        populate: { path: "type", select: "name" },
-      },
-    ],
-  });
+  const history = await History.find()
+    .sort({ boughtAt: -1 })
+    .populate({
+      path: "product",
+      populate: [
+        {
+          path: "plat",
+          select: "name currency price",
+          populate: { path: "category", select: "name" },
+          populate: { path: "type", select: "name" },
+        },
+      ],
+    });
   res.status(200).json(history);
-}
+};
 
 exports.getLast10Orders = async (req, res) => {
   try {
     const orders = await History.find()
       .sort({ boughtAt: -1 })
       .limit(10)
-      .populate("product.plat"); 
+      .populate("product.plat");
 
     res.status(200).json(orders);
   } catch (error) {
