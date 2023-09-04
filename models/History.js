@@ -10,7 +10,7 @@ const historySchema = mongoose.Schema({
       },
       addons: [
         {
-          _id: { type: String, required: true },
+          _id: { type: String },
           name: { type: String, required: true },
           count: { type: Number },
           total: { type: Number },

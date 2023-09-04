@@ -45,7 +45,6 @@ exports.getHistory = async (req, res) => {
           path: "plat",
           select: "name currency price",
           populate: { path: "category", select: "name" },
-          populate: { path: "type", select: "name" },
         },
       ],
     });
