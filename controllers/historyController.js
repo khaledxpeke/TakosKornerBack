@@ -56,7 +56,7 @@ exports.getLast10Orders = async (req, res) => {
     const orders = await History.find()
       .sort({ boughtAt: -1 })
       .limit(10)
-      .populate("product.plat");
+      .populate("product.plat._id");
 
     res.status(200).json(orders);
   } catch (error) {
