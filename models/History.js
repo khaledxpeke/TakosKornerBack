@@ -4,9 +4,11 @@ const historySchema = mongoose.Schema({
   product: [
     {
       plat: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-        required: true,
+        _id: { type: String, required: true },
+        category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+        name: { type: String, required: true },
+        price: { type: Number },
+        currency: { type: String },
       },
       addons: [
         {
