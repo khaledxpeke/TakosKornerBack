@@ -75,7 +75,9 @@ exports.getCommandNumber = async (req, res) => {
     let lastCommandNumber = lastHistoryEntry
       ? lastHistoryEntry.commandNumber
       : 0;
-    const lastCommandDate = lastHistoryEntry.boughtAt;
+    const lastCommandDate = lastHistoryEntry
+      ? lastHistoryEntry.boughtAt
+      : currentDate;
     const daysDifference = Math.floor(
       (currentDate - lastCommandDate) / (1000 * 60 * 60 * 24)
     );
