@@ -63,3 +63,31 @@ exports.getLast10Orders = async (req, res) => {
     throw error;
   }
 };
+
+exports.getCommandNumber = async (req, res) => {
+  const currentDate = new Date();
+
+  try {
+    const lastHistoryEntry = await History.findOne({}, null, {
+      sort: { boughtAt: -1 },
+    });
+
+    let lastCommandNumber = lastHistoryEntry
+      ? lastHistoryEntry.commandNumber
+      : 0;
+    const lastCommandDate = lastHistoryEntry.boughtAt;
+    const daysDifference = Math.floor(
+      (currentDate - lastCommandDate) / (1000 * 60 * 60 * 24)
+    );
+    if (daysDifference > 0) {
+      lastCommandNumber = 1;
+    } else {
+      lastCommandNumber++;
+    }
+
+    res.status(200).json(lastCommandNumber);
+  } catch (error) {
+    console.error("Error getting command number:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
