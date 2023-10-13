@@ -41,7 +41,6 @@ const historySchema = mongoose.Schema({
   },
   commandNumber: {
     type: Number,
-    required: true,
   },
   boughtAt: {
     type: Date,
