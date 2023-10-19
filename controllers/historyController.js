@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
 exports.addHistory = async (req, res) => {
-  const { products, pack, total } = req.body;
+  const { products, pack, total,commandNumber } = req.body;
   const decodedList = JSON.parse(products);
   const history = await new History({
     product: decodedList.map((product) => ({
@@ -18,6 +18,7 @@ exports.addHistory = async (req, res) => {
     })),
     pack,
     total,
+    commandNumber,
   });
   console.log("Before saving history:", history);
   history
