@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 
 exports.addHistory = async (req, res) => {
-  const { products, pack, total } = req.body;
+  const { products, pack, total, commandNumber } = req.body;
   const decodedList = JSON.parse(products);
   const history = await new History({
     product: decodedList.map((product) => ({
@@ -18,6 +18,7 @@ exports.addHistory = async (req, res) => {
     })),
     pack,
     total,
+    commandNumber:parseInt(commandNumber, 10),
   });
   console.log("Before saving history:", history);
   history
@@ -68,13 +69,13 @@ exports.getCommandNumber = async (req, res) => {
   const currentDate = new Date();
 
   try {
-    const lastHistoryEntry = await History.findOne({}, null, {
-      sort: { boughtAt: -1 },
-    });
+    const lastHistoryEntry = await History.findOne()
+    .sort({ boughtAt: -1 });
 
     let lastCommandNumber = lastHistoryEntry
       ? lastHistoryEntry.commandNumber
       : 0;
+    console.log(lastHistoryEntry);
     const lastCommandDate = lastHistoryEntry
       ? lastHistoryEntry.boughtAt
       : currentDate;
