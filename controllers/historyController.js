@@ -18,7 +18,7 @@ exports.addHistory = async (req, res) => {
     })),
     pack,
     total,
-    commandNumber:parseInt(commandNumber, 10),
+    commandNumber:parseInt(commandNumber, 10)
   });
   console.log("Before saving history:", history);
   history
