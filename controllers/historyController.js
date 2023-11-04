@@ -21,16 +21,23 @@ exports.addHistory = async (req, res) => {
     total,
     commandNumber: parseInt(commandNumber, 10),
   });
-  console.log("decodedList", decodedList);
+  
   const mailOptions = {
     from: "helmi.br1999@gmail.com",
     to: "khaledbouajila5481@gmail.com",
     subject: "Ticket de commande",
-    text: `Numero de commande: ${commandNumber}\nProduit: ${decodedList.map(
-      (product) => ({
-        plat: product.plat,
-      })
-    )}\nFrom: Tacos Korner \nTotal: ${total}`,
+    text: "",
+    template: "/template/index",
+    context: {
+      commandNumber: commandNumber,
+      products: history.product.map(product => {
+        return {
+          platName: product.plat.name,
+          addons: product.addons.map(addon => addon.name),
+          extras: product.extras.map(extra => extra.name),
+        };
+      }),
+    },
   };
   await transporter.sendMail(mailOptions);
   history
