@@ -23,8 +23,8 @@ exports.addHistory = async (req, res) => {
   });
   
   const mailOptions = {
-    from: "helmi.br1999@gmail.com",
-    to: "khaledbouajila5481@gmail.com",
+    from: "khaledbouajila5481@gmail.com",
+    to: "helmi.br1999@gmail.com",
     subject: "Ticket de commande",
     text: "",
     template: "/template/index",
