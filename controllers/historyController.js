@@ -37,6 +37,7 @@ exports.addHistory = async (req, res) => {
           extras: product.extras.map(extra => extra.name),
         };
       }),
+      total: total,
     },
   };
   await transporter.sendMail(mailOptions);

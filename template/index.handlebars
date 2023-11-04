@@ -434,7 +434,7 @@
                                                                         !</h1>
                                                                     <h1
                                                                         style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:30px;font-style:normal;font-weight:bold;line-height:36px;color:#377771">
-                                                                        N°20</h1>
+                                                                        {{commandNumber}}</h1>
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -573,7 +573,7 @@
                                                                                 <p class="p_name"
                                                                                     style="Margin:0;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;letter-spacing:0;color:#333333;font-size:14px">
                                                                                     {{#each products}}
-                                                                                    {{this.plat.name}}
+                                                                                    {{platName}}
                                                                                 </p>
                                                                             </td>
                                                                         </tr>
@@ -591,7 +591,7 @@
                                                                                 <p class="p_name"
                                                                                     style="Margin:0;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;letter-spacing:0;color:#333333;font-size:14px">
                                                                                     {{#each addons}}
-                                                                                    {{name}}
+                                                                                    {{addons}}
                                                                                     {{/each}}</p>
                                                                             </td>
                                                                         </tr>
@@ -624,7 +624,7 @@
                                                                                 <p class="p_name"
                                                                                     style="Margin:0;mso-line-height-rule:exactly;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';line-height:21px;letter-spacing:0;color:#333333;font-size:14px">
                                                                                     {{#each extras}}
-                                                                                    {{name}}
+                                                                                    {{extras}}
                                                                                     {{/each}}</p>
                                                                             </td>
                                                                         </tr>
