@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
+const transporter = require("../middleware/email");
 
 exports.addHistory = async (req, res) => {
   const { products, pack, total, commandNumber } = req.body;
@@ -18,13 +19,23 @@ exports.addHistory = async (req, res) => {
     })),
     pack,
     total,
-    commandNumber:parseInt(commandNumber, 10)
+    commandNumber: parseInt(commandNumber, 10),
   });
-  console.log("Before saving history:", history);
+  console.log("decodedList", decodedList);
+  const mailOptions = {
+    from: "helmi.br1999@gmail.com",
+    to: "khaledbouajila5481@gmail.com",
+    subject: "Ticket de commande",
+    text: `Numero de commande: ${commandNumber}\nProduit: ${decodedList.map(
+      (product) => ({
+        plat: product.plat,
+      })
+    )}\nFrom: Tacos Korner \nTotal: ${total}`,
+  };
+  await transporter.sendMail(mailOptions);
   history
     .save()
     .then((result) => {
-      console.log("History saved:", result);
       res.status(201).json(result);
     })
     .catch((err) => {
@@ -69,8 +80,7 @@ exports.getCommandNumber = async (req, res) => {
   const currentDate = new Date();
 
   try {
-    const lastHistoryEntry = await History.findOne()
-    .sort({ boughtAt: -1 });
+    const lastHistoryEntry = await History.findOne().sort({ boughtAt: -1 });
 
     let lastCommandNumber = lastHistoryEntry
       ? lastHistoryEntry.commandNumber
