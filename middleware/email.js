@@ -16,7 +16,7 @@ transporter.use(
   hbs({
     viewEngine: {
       extname: ".handlebars",
-      layoutsDir: "./src/api/views",
+      layoutsDir: "./template",
       defaultLayout: "index",
     },
     viewPath: "./",
