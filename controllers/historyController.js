@@ -33,19 +33,22 @@ exports.addHistory = async (req, res) => {
       products: history.product.map(product => {
         return {
           platName: product.plat.name,
+          currency: product.plat.currency,
           price: product.plat.price,
           addons: product.addons.map(addon => {
             return {
               name: addon.name,
               count: addon.count,
-              total: addon.total
+              total: addon.total,
+              currency: product.plat.currency
             };
           }),
           extras: product.extras.map(extra => {
             return {
               name: extra.name,
               count: extra.count,
-              total: extra.total
+              total: extra.total,
+              currency: product.plat.currency
             };
           }),
         };
