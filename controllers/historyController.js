@@ -9,7 +9,7 @@ app.use(express.json());
 const transporter = require("../middleware/email");
 
 exports.addHistory = async (req, res) => {
-  const { products, pack, total, commandNumber } = req.body;
+  const { products, pack, name, email, total, commandNumber } = req.body;
   const decodedList = JSON.parse(products);
   const history = await new History({
     product: decodedList.map((product) => ({
@@ -18,37 +18,39 @@ exports.addHistory = async (req, res) => {
       extras: product.extras,
     })),
     pack,
+    name,
+    email,
     total,
     commandNumber: parseInt(commandNumber, 10),
   });
-  
   const mailOptions = {
     from: "khaledbouajila5481@gmail.com",
-    to: "helmi.br1999@gmail.com",
+    to: email,
     subject: "Ticket de commande",
     text: "",
     template: "/template/index",
     context: {
       commandNumber: commandNumber,
-      products: history.product.map(product => {
+      name: name,
+      products: history.product.map((product) => {
         return {
           platName: product.plat.name,
           currency: product.plat.currency,
           price: product.plat.price,
-          addons: product.addons.map(addon => {
+          addons: product.addons.map((addon) => {
             return {
               name: addon.name,
               count: addon.count,
               total: addon.total,
-              currency: product.plat.currency
+              currency: product.plat.currency,
             };
           }),
-          extras: product.extras.map(extra => {
+          extras: product.extras.map((extra) => {
             return {
               name: extra.name,
               count: extra.count,
               total: extra.total,
-              currency: product.plat.currency
+              currency: product.plat.currency,
             };
           }),
         };

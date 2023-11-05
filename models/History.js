@@ -35,6 +35,14 @@ const historySchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
   total: {
     type: String,
     required: true,
