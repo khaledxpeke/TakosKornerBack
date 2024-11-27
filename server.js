@@ -4,6 +4,7 @@ const connectDB = require("./db/db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { userAuth } = require("./middleware/auth");
+const path = require("path");
 app.timeout = 300000;
 app.use(
   cors({
@@ -31,7 +32,8 @@ app.use("/api/extra", require("./routes/extraRoutes"));
 app.use("/api/history", require("./routes/historyRoutes"));
 app.use("/api/drink", require("./routes/drinkRoutes"));
 app.use("/api/currency", require("./routes/currencyRoutes"));
-app.use("/api/uploads", express.static("uploads"));
+app.use("/api/carousel", require("./routes/carouselRoutes"));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.get(userAuth, (req, res) => res.send("User Route"));
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" });
