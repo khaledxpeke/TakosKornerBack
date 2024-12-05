@@ -1,4 +1,5 @@
 const Mongoose = require("mongoose");
+const settings = require("./settings");
 const ProductSchema = new Mongoose.Schema({
   name: {
     type: String,
@@ -54,6 +55,27 @@ const ProductSchema = new Mongoose.Schema({
   maxDrink:{
     type: Number,
   },
+});
+
+ProductSchema.pre("save", async function (next) {
+  try {
+    const settings = await settings.findOne(); 
+    if (!settings) {
+      throw new Error("Settings not configured.");
+    }
+
+    if (!this.currency) {
+      this.currency = settings.defaultCurrency;
+    }
+
+    if (!settings.currencies.includes(this.currency)) {
+      throw new Error(`Invalid currency. Allowed values are: ${settings.currencies.join(", ")}`);
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 const Product = Mongoose.model("Product", ProductSchema);

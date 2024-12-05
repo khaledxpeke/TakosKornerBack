@@ -27,17 +27,9 @@ exports.addCarouselMedia = async (req, res) => {
       });
     }
     try {
-      const { type } = req.body;
-
-      if (!["image", "video"].includes(type)) {
-        return res
-          .status(400)
-          .json({ message: "Type de fichier non valide. Doit être une image ou une vidéo." });
-      }
 
       const newMediaDocs = req.files.map((file) => ({
         fileUrl: `/uploads/carousel/${file.filename}`,
-        type,
         isActive: false,
       }));
 
