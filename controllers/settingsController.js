@@ -6,8 +6,8 @@ app.use(express.json());
 
 exports.addSettings = async (req, res) => {
   try {
-    const { currency, tva } = req.body;
-    if (!currency && tva === undefined) {
+    const { currency } = req.body;
+    if (!currency) {
       return res.status(400).json({ message: "Currency is required" });
     }
 
@@ -19,26 +19,17 @@ exports.addSettings = async (req, res) => {
 
       existing.currencies.push(currency.toUpperCase());
 
-      if (tva !== undefined) {
-        if (tva < 0) {
-          return res
-            .status(400)
-            .json({ message: "TVA must be a non-negative value" });
-        }
-        existing.tva = tva;
         await existing.save();
         return res.status(200).json(existing);
-      }
     } else {
-      if (currency === undefined || tva === undefined) {
+      if (currency === undefined ) {
         return res
           .status(400)
-          .json({ message: "Currency and TVA are required" });
+          .json({ message: "Currency is required" });
       }
       const newSettings = new Settings({
         currencies: [currency.toUpperCase()],
         defaultCurrency: currency.toUpperCase(),
-        tva,
       });
       await newSettings.save();
       return res.status(201).json(newSettings);
@@ -103,3 +94,33 @@ exports.updateDefaultCurrency = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteCurrency = async (req, res) => {
+  try {
+    const { currency } = req.body;
+    if (!currency) {
+      return res.status(400).json({ message: "Currency is required" });
+    }
+
+    const currencyDoc = await Settings.findOne();
+    if (!currencyDoc || !currencyDoc.currencies.includes(currency.toUpperCase())) {
+      return res.status(400).json({ message: "Currency not found" });
+    }
+
+    currencyDoc.currencies = currencyDoc.currencies.filter(
+      (c) => c !== currency.toUpperCase()
+    );
+    if (currencyDoc.defaultCurrency === currency.toUpperCase()) {
+      currencyDoc.defaultCurrency = currencyDoc.currencies[0];
+    }
+
+    await currencyDoc.save();
+    res.status(200).json({
+      message: "Currency deleted",
+      currencies: currencyDoc.currencies,
+      defaultCurrency: currencyDoc.defaultCurrency,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
