@@ -5,7 +5,7 @@ const {
   getSettings,
   addSettings,
   updateDefaultCurrency,
-} = require("../controllers/currencyController");
+} = require("../controllers/settingsController");
 
 router.route("/currency").get(userAuth, getAllCurrencies);
 router.route("/").get(userAuth, getSettings);
