@@ -13,17 +13,17 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 exports.addCarouselMedia = async (req, res) => {
-  upload.single("fileUrl")(req, res, async (err) => {
+  upload.array("fileUrl", 10)(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
         message: "Image upload failed",
         error: err.message,
       });
     }
-    if (!req.file) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({
-        message: "Ajouter une image",
-        error: "Please upload an image",
+        message: "Please upload at least one image",
+        error: "No files were uploaded",
       });
     }
     try {
@@ -35,13 +35,13 @@ exports.addCarouselMedia = async (req, res) => {
           .json({ message: "Type de fichier non valide. Doit être une image ou une vidéo." });
       }
 
-      const newMedia = new CarouselMedia({
-        fileUrl: `/uploads/carousel/${req.file.filename}`,
+      const newMediaDocs = req.files.map((file) => ({
+        fileUrl: `/uploads/carousel/${file.filename}`,
         type,
         isActive: false,
-      });
+      }));
 
-      await newMedia.save();
+      const newMedia = await CarouselMedia.insertMany(newMediaDocs);
 
       res.status(201).json(
         newMedia
