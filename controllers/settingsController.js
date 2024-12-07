@@ -124,3 +124,52 @@ exports.deleteCurrency = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 }
+
+exports.updateCurrencyOrTva = async (req, res) => {
+  try {
+    const { oldCurrency, newCurrency, tva } = req.body;
+
+    const settings = await Settings.findOne();
+    if (!settings) {
+      return res.status(404).json({ message: "Settings not found" });
+    }
+
+    if (oldCurrency && newCurrency) {
+      const oldCurrencyUpper = oldCurrency.toUpperCase();
+      const newCurrencyUpper = newCurrency.toUpperCase();
+
+      if (!settings.currencies.includes(oldCurrencyUpper)) {
+        return res.status(400).json({ message: "Old currency not found in the list" });
+      }
+
+      if (settings.currencies.includes(newCurrencyUpper)) {
+        return res.status(400).json({ message: "New currency already exists in the list" });
+      }
+
+      settings.currencies = settings.currencies.map((c) =>
+        c === oldCurrencyUpper ? newCurrencyUpper : c
+      );
+
+      if (settings.defaultCurrency === oldCurrencyUpper) {
+        settings.defaultCurrency = newCurrencyUpper;
+      }
+    }
+
+    if (tva !== undefined) {
+      if (tva < 0) {
+        return res.status(400).json({ message: "TVA must be a positive number" });
+      }
+      settings.tva = tva;
+    }
+
+    await settings.save();
+
+    res.status(200).json({
+      message: "Settings updated successfully",
+      settings,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
