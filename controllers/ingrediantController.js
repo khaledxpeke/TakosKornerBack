@@ -30,7 +30,7 @@ exports.createIngredient = async (req, res, next) => {
 
     const { name, typeId,price} = req.body;
     const userId = req.user.user._id;
-    const image = req.file.path;
+    const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
       const nameAlreadyExist = await Ingrediant.findOne({ name });
       if (nameAlreadyExist) {

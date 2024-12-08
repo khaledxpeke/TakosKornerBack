@@ -26,7 +26,7 @@ exports.addDesert = async (req, res, next) => {
     }
 
     const { name, price,max } = req.body;
-    const image = req.file.path;
+    const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
       const deserts = await Desert.create({
         name,

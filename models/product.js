@@ -1,5 +1,5 @@
 const Mongoose = require("mongoose");
-const settings = require("./settings");
+const Settings = require("./settings");
 const ProductSchema = new Mongoose.Schema({
   name: {
     type: String,
@@ -59,7 +59,7 @@ const ProductSchema = new Mongoose.Schema({
 
 ProductSchema.pre("save", async function (next) {
   try {
-    const settings = await settings.findOne(); 
+    const settings = await Settings.findOne(); 
     if (!settings) {
       throw new Error("Settings not configured.");
     }

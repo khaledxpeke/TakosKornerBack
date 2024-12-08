@@ -8,8 +8,9 @@ app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
-
+const path = require("path");
 const upload = multer({ storage: multerStorage });
+
 exports.addExtra = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
@@ -21,7 +22,7 @@ exports.addExtra = async (req, res, next) => {
 
     const { name, price } = req.body;
     const userId = req.user.user._id;
-    const image = req.file?.path || "";
+    const image = `uploads\\${req.file?.filename}`|| ""; 
     try {
       const extra = await Extra.create({
         name,

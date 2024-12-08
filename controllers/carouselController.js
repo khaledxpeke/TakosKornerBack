@@ -13,6 +13,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 exports.addCarouselMedia = async (req, res) => {
+  req.uploadTarget = "carousel";
   upload.array("fileUrl", 10)(req, res, async (err) => {
     if (err) {
       return res.status(400).json({

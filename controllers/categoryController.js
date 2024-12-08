@@ -24,7 +24,7 @@ exports.createCategory = async (req, res) => {
     }
 
     const userId = req.user.user._id;
-    const image = req.file.path;
+    const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
     const category = await Category.create({
       createdBy: userId,

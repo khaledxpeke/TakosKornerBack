@@ -32,7 +32,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const userId = req.user.user._id;
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
-    const image = req.file.path;
+    const image = `uploads/${req.file?.filename}`|| ""; ;
     const { currency, choice, maxExtras, maxDessert, maxDrink } = req.body;
     const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || [];
