@@ -111,10 +111,11 @@ exports.updateDesert = async (req, res) => {
       res.status(500).json({ message: "aucun Dessert trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| ""; 
       if (desert.image) {
         fs.unlinkSync(desert.image);
       }
-      desert.image = req.file.path;
+      desert.image = image;
     }
     try {
       const updatedDesert = await Desert.findByIdAndUpdate(desertId, {

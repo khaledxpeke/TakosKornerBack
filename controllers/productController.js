@@ -230,10 +230,11 @@ exports.updateProduct = async (req, res) => {
       }
 
       if (req.file) {
+        const image = `uploads\\${req.file?.filename}`|| ""; 
         if (product.image) {
           fs.unlinkSync(product.image);
         }
-        product.image = req.file.path;
+        product.image = image;
       }
 
       product.name = name || product.name;

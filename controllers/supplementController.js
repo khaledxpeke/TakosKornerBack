@@ -180,10 +180,11 @@ exports.updateSupplement = async (req, res) => {
       res.status(500).json({ message: "aucun Supplement trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| "";
       if (supplement.image) {
         fs.unlinkSync(supplement.image);
       }
-      supplement.image = req.file.path;
+      supplement.image = image;
     }
     try {
       const updatedsupplement = await Supplement.findByIdAndUpdate(supplementId, {

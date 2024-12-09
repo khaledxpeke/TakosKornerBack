@@ -79,10 +79,11 @@ exports.updateExtra = async (req, res) => {
       res.status(500).json({ message: "aucun Extra trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| ""; 
       if (extra.image) {
         fs.unlinkSync(extra.image);
       }
-      extra.image = req.file.path;
+      extra.image = image;
     }
     try {
       const updatedextra = await Extra.findByIdAndUpdate(extraId, {

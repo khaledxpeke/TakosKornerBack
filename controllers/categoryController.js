@@ -96,10 +96,11 @@ exports.updateCategory = async (req, res) => {
       res.status(500).json({ message: "Aucun Categorie trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| ""; 
       if (category.image) {
         fs.unlinkSync(category.image);
       }
-      category.image = req.file.path;
+      category.image = image;
     }
     try {
       const updatedcategory = await Category.findByIdAndUpdate(categoryId, {

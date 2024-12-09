@@ -186,10 +186,11 @@ exports.updateIngrediant = async (req, res) => {
       res.status(500).json({ message: "aucun Ingrediant trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| ""; 
       if (ingrediant.image) {
         fs.unlinkSync(ingrediant.image);
       }
-      ingrediant.image = req.file.path;
+      ingrediant.image = image;
     }
     try {
       

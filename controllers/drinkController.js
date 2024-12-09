@@ -111,10 +111,11 @@ exports.updateDrink = async (req, res) => {
       res.status(500).json({ message: "aucun Boisson trouvée" });
     }
     if (req.file) {
+      const image = `uploads\\${req.file?.filename}`|| ""; 
       if (drink.image) {
         fs.unlinkSync(drink.image);
       }
-      drink.image = req.file.path;
+      drink.image = image;
     }
     try {
       const updatedDrink = await Drink.findByIdAndUpdate(drinkId, {
