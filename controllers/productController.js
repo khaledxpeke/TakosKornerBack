@@ -159,7 +159,7 @@ exports.getAllProducts = async (req, res, next) => {
       {
         path: "ingrediants",
         select: "name",
-        populate: { path: "type", select: "name" },
+        populate: { path: "types", select: "name" },
       },
     ]);
     res.status(200).json(products);
