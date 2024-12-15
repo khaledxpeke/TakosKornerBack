@@ -18,11 +18,13 @@ const ingrediantSchema = mongoose.Schema({
       ref: "Product",
     },
   ],
-  type: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Type",
-    required: true,
-  },
+  types: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Type",
+      required: true,
+    },
+  ],
   price: {
     type: Number,
   },

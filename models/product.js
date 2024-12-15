@@ -57,26 +57,29 @@ const ProductSchema = new Mongoose.Schema({
   },
 });
 
-ProductSchema.pre("save", async function (next) {
-  try {
-    const settings = await Settings.findOne(); 
-    if (!settings) {
-      throw new Error("Settings not configured.");
-    }
+// ProductSchema.pre("save", async function (next) {
+//   try {
+//     const settings = await Settings.findOne(); 
+//     if (!settings) {
+//       throw new Error("Settings not configured.");
+//     }
 
-    if (!this.currency) {
-      this.currency = settings.defaultCurrency;
-    }
+//     if (!this.currency) {
+//       console.log("Currency is missing, setting default:", settings.defaultCurrency);
+//       this.currency = settings.defaultCurrency;
+//     }
+//     if (this.currency) {
+//       this.currency = settings.defaultCurrency;
+//     }
 
-    if (!settings.currencies.includes(this.currency)) {
-      throw new Error(`Invalid currency. Allowed values are: ${settings.currencies.join(", ")}`);
-    }
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+//     if (!settings.currencies.includes(this.currency)) {
+//       throw new Error(`Invalid currency. Allowed values are: ${settings.currencies.join(", ")}`);
+//     }
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 const Product = Mongoose.model("Product", ProductSchema);
 module.exports = Product;

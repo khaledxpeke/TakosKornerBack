@@ -10,6 +10,7 @@ app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
+const { default: mongoose } = require("mongoose");
 
 const upload = multer({ storage: multerStorage });
 
@@ -28,7 +29,7 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeId,price} = req.body;
+    const { name, typeIds,price} = req.body;
     const userId = req.user.user._id;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
@@ -36,10 +37,19 @@ exports.createIngredient = async (req, res, next) => {
       if (nameAlreadyExist) {
         return res.status(400).json({ message: "Ingrediant déja existant" });
       }
+      let typesArray = [];
+      if (typeIds) {
+        typesArray = Array.isArray(typeIds)
+          ? typeIds 
+          : JSON.parse(typeIds); 
+
+        // Convert to ObjectId
+        typesArray = typesArray.map((id) => new mongoose.Types.ObjectId(id));
+      }
       const ingredient = await Ingrediant.create({
         name,
         image,
-        type: typeId,
+        types: typesArray,
         createdBy: userId,
       });
       if (price) {
@@ -76,7 +86,6 @@ exports.addIngrediantToProduct = async (req, res, next) => {
       });
     }
 
-    // Check if the ingrediant already exists in the product
     const ingrediantIndex = product.ingrediants.findIndex(
       (ingrediant) => ingrediant.toString() === ingrediantId
     );
@@ -87,8 +96,8 @@ exports.addIngrediantToProduct = async (req, res, next) => {
     }
 
     product.ingrediants.push(ingrediant);
-    if (!product.type.includes(ingrediant.type)) {
-      product.type.push(ingrediant.type);
+    if (!product.type.some((type) => ingrediant.types.includes(type))) {
+      product.type.push(...ingrediant.types);
     }
     await product.save();
     ingrediant.product.push(productId);
@@ -105,7 +114,7 @@ exports.getIngrediantByProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
     const ingrediants = await Ingrediant.find({ product: productId }).populate(
-      "type"
+      "types"
     );
     res.status(200).json(ingrediants);
   } catch (error) {
@@ -122,8 +131,8 @@ exports.getIngredientsByType = async (req, res, next) => {
   try {
     const ingrediants = await Ingrediant.find({
       product: productId,
-      type: typeId,
-    }).populate("type");
+      types: typeId,
+    }).populate("types");
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(500).json({
@@ -135,7 +144,7 @@ exports.getIngredientsByType = async (req, res, next) => {
 
 exports.getAllIngrediants = async (req, res, next) => {
   try {
-    const ingrediants = await Ingrediant.find().populate("type");
+    const ingrediants = await Ingrediant.find().populate("types");
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(400).json({
@@ -147,7 +156,7 @@ exports.getAllIngrediants = async (req, res, next) => {
 exports.getAllIngrediantsByType = async (req, res, next) => {
   try {
     const ingrediants = await Ingrediant.find({}, { _id: 1, name: 1 }).populate(
-      "type",
+      "types",
       { name: 1 }
     );
     
@@ -176,7 +185,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, type,price } = req.body;
+    const { name, types,price } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -195,7 +204,7 @@ exports.updateIngrediant = async (req, res) => {
     try {
       
       ingrediant.name = name || ingrediant.name;
-      ingrediant.type = type || ingrediant.type;
+      ingrediant.types = types || ingrediant.types;
       if (price !== undefined) {
         ingrediant.price = price !== "" ? price : null;
       }
@@ -209,10 +218,10 @@ exports.updateIngrediant = async (req, res) => {
             return await Ingrediant.findById(ingrediant);
           })
         );
-        const types = ingrediants.map((ingrediant) => ingrediant.type);
+        const types = ingrediants.map((ingrediant) => ingrediant.types).flat();
         const uniqueTypes = types.reduce((unique, current) => {
           const isDuplicate = unique.some(
-            (obj) => obj.valueOf() === current.valueOf()
+            (obj) => obj._id.toString() === current._id.toString()
           );
           if (!isDuplicate) {
             unique.push(current);
