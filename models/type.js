@@ -13,11 +13,11 @@ const typeSchema = mongoose.Schema({
       default: false,
     },
     payment: {
-      type: String,
+      type: Boolean,
       default: false,
     },
     selection: {
-      type: String,
+      type: Boolean,
       default: false,
     },
     quantity : {
