@@ -72,15 +72,14 @@ exports.getAllCategories = async (req, res) => {
           }).select("name image price suppPrice outOfStock");
           
           typeObj.ingrediants = typeIngredients.map(ing => {
-            // const ingObj = ing.toObject();
-            // If payment is false, use suppPrice instead of price
+
             const calculatedPrice = !type.payment ? ing.suppPrice : ing.price;
             return {
               _id: ing._id,
               name: ing.name,
               image: ing.image,
               price: calculatedPrice,
-              outOfStock: ing.outOfStock
+              // outOfStock: ing.outOfStock
             };
           });
           return typeObj;
