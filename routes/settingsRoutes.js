@@ -10,7 +10,7 @@ const {
 } = require("../controllers/settingsController");
 
 router.route("/currency").get(userAuth, getAllCurrencies);
-router.route("/").get(userAuth, getSettings);
+router.route("/").get(getSettings);
 router.route("/").post(userAuth, addSettings);
 router.route("/currency").delete(deleteCurrency);
 router.route("/currency").put(userAuth, updateDefaultCurrency);
