@@ -28,6 +28,14 @@ const ingrediantSchema = mongoose.Schema({
   price: {
     type: Number,
   },
+  suppPrice: {
+    type: Number,
+    default: 0,
+  },
+  inStock: {
+    type: Boolean,
+    default: false,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

@@ -51,18 +51,18 @@ exports.getAllCategories = async (req, res) => {
     const categories = await Category.find().populate({
       path: "products",
       populate: [
-        {
-          path: "ingrediants",
-          select: "name image price",
-          populate: { path: "types", select: "name message price" },
-        },
-        { path: "supplements", select: "name image price" },
+        // {
+        //   path: "ingrediants",
+        //   select: "name image price",
+        //   populate: { path: "types", select: "name message price" },
+        // },
+        // { path: "supplements", select: "name image price" },
         { path: "type", select: "name message price isRequired" },
-        {
-          path: "rules",
-          select: "free quantity",
-          populate: { path: "type", select: "name message price isRequired" },
-        },
+        // {
+        //   path: "rules",
+        //   select: "free quantity",
+        //   populate: { path: "type", select: "name message price isRequired" },
+        // },
       ],
     });
     res.status(200).json(categories);

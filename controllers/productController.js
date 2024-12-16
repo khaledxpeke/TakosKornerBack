@@ -34,10 +34,10 @@ exports.addProductToCategory = async (req, res, next) => {
     const name = req.body.name.replace(/"/g, "");
     const image = `uploads/${req.file?.filename}`|| ""; ;
     const { currency, choice, maxExtras, maxDessert, maxDrink } = req.body;
-    const ingrediantIds = req.body.ingrediants?.split(",") || [];
-    const typeIds = req.body.type || [];
-    const rules = JSON.parse(req.body.rules) || [];
-    const supplementIds = req.body.supplements?.split(",") || [];
+    // const ingrediantIds = req.body.ingrediants?.split(",") || [];
+    const typeIds = req.body.type ? JSON.parse(req.body.type) : []; 
+    // const rules = JSON.parse(req.body.rules) || [];
+    // const supplementIds = req.body.supplements?.split(",") || [];
     const rulesIds = [];
     try {
       let product = await Product.findOne({ name });
@@ -47,25 +47,25 @@ exports.addProductToCategory = async (req, res, next) => {
           message: "Produit existe déja",
         });
       } else {
-        for (const ruleData of rules) {
-          try {
-            const rule = new Rule(ruleData);
-            const savedRule = await rule.save();
-            rulesIds.push(savedRule._id);
-          } catch (error) {
-            console.error("Error saving rule:", error);
-          }
-        }
+        // for (const ruleData of rules) {
+        //   try {
+        //     const rule = new Rule(ruleData);
+        //     const savedRule = await rule.save();
+        //     rulesIds.push(savedRule._id);
+        //   } catch (error) {
+        //     console.error("Error saving rule:", error);
+        //   }
+        // }
         const product = new Product({
           name,
           price,
           category: categoryId,
-          currency,
+          // currency,
           type: typeIds,
-          rules: rulesIds,
+          // rules: rulesIds,
           createdBy: userId,
-          ingrediants: ingrediantIds,
-          supplements: supplementIds,
+          // ingrediants: ingrediantIds,
+          // supplements: supplementIds,
           choice,
         });
         if (maxExtras) {
@@ -82,11 +82,11 @@ exports.addProductToCategory = async (req, res, next) => {
           await product.save();
         }
 
-        const productIngrediants = await Promise.all(
-          ingrediantIds.map(async (ingrediant) => {
-            return await Ingrediant.findById(ingrediant);
-          })
-        );
+        // const productIngrediants = await Promise.all(
+        //   ingrediantIds.map(async (ingrediant) => {
+        //     return await Ingrediant.findById(ingrediant);
+        //   })
+        // );
         // const types = productIngrediants.map((ingrediant) => ingrediant.type);
         // const uniqueTypes = types.reduce((unique, current) => {
         //   const isDuplicate = unique.some(
@@ -111,10 +111,10 @@ exports.addProductToCategory = async (req, res, next) => {
         //   { type: { $in: typeIds } },
         //   { $push: { product: savedProduct._id } }
         // );
-        await Ingrediant.updateMany(
-          { _id: { $in: ingrediantIds } },
-          { $push: { product: savedProduct._id } }
-        );
+        // await Ingrediant.updateMany(
+        //   { _id: { $in: ingrediantIds } },
+        //   { $push: { product: savedProduct._id } }
+        // );
 
         res.status(201).json({
           product: savedProduct,
@@ -152,15 +152,15 @@ exports.getAllProducts = async (req, res, next) => {
         path: "type",
         select: "name",
       },
-      {
-        path: "rules",
-        select: "type free quantity",
-      },
-      {
-        path: "ingrediants",
-        select: "name",
-        populate: { path: "types", select: "name" },
-      },
+      // {
+      //   path: "rules",
+      //   select: "type free quantity",
+      // },
+      // {
+      //   path: "ingrediants",
+      //   select: "name",
+      //   populate: { path: "types", select: "name" },
+      // },
     ]);
     res.status(200).json(products);
   } catch (error) {
@@ -211,7 +211,7 @@ exports.updateProduct = async (req, res) => {
     const {
       name,
       price,
-      currency,
+      // currency,
       supplements,
       ingrediants,
       category,
@@ -239,7 +239,7 @@ exports.updateProduct = async (req, res) => {
 
       product.name = name || product.name;
       product.price = price || product.price;
-      product.currency = currency || product.currency;
+      // product.currency = currency || product.currency;
       product.category = category || product.category;
       product.choice = choice || product.choice;
       product.maxExtras = maxExtras || product.maxExtras;

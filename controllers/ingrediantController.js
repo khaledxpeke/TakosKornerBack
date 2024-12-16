@@ -29,7 +29,7 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeIds,price} = req.body;
+    const { name, typeIds,price ,inStock, suppPrice} = req.body;
     const userId = req.user.user._id;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
@@ -43,13 +43,14 @@ exports.createIngredient = async (req, res, next) => {
           ? typeIds 
           : JSON.parse(typeIds); 
 
-        // Convert to ObjectId
         typesArray = typesArray.map((id) => new mongoose.Types.ObjectId(id));
       }
       const ingredient = await Ingrediant.create({
         name,
         image,
         types: typesArray,
+        inStock,
+        suppPrice,
         createdBy: userId,
       });
       if (price) {
@@ -185,7 +186,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, types,price } = req.body;
+    const { name, types,price,inStock,suppPrice} = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -205,6 +206,8 @@ exports.updateIngrediant = async (req, res) => {
       
       ingrediant.name = name || ingrediant.name;
       ingrediant.types = types || ingrediant.types;
+      ingrediant.inStock = inStock || ingrediant.inStock;
+      ingrediant.suppPrice = suppPrice || ingrediant.suppPrice;
       if (price !== undefined) {
         ingrediant.price = price !== "" ? price : null;
       }

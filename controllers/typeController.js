@@ -11,20 +11,21 @@ const fs = require("fs");
 const path = require("path");
 
 exports.createType = async (req, res, next) => {
-  const { name, message,isRequired } = req.body;
+  const { name, message, isRequired, quantity, payment, selection } = req.body;
 
   try {
-    // Check if the type already exists
     const existingType = await Type.findOne({ name });
     if (existingType) {
       return res.status(400).json({ message: "Type existe déja" });
     }
 
-    // Create a new type
     const newType = new Type({
       name,
       message,
-      isRequired
+      isRequired,
+      quantity,
+      payment,
+      selection,
     });
     await newType.save();
 
@@ -64,7 +65,8 @@ exports.getTypeById = async (req, res, next) => {
 exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
-    const { name, message,price,isRequired } = req.body;
+    const { name, message, isRequired, quantity, payment, selection } =
+      req.body;
     const type = await Type.findById(typeId);
     if (!type) {
       res.status(500).json({ message: "aucun Type trouvée" });
@@ -73,10 +75,12 @@ exports.updateType = async (req, res, next) => {
       name,
       message,
       isRequired,
-      price: price || type.price,
+      quantity: quantity || type.quantity,
+      payment: payment || type.payment,
+      selection: selection || type.selection,
     });
 
-    res.status(200).json({ message: "Type modifié avec succées" });
+    res.status(200).json({ updatedType, message: "Type modifié avec succées" });
   } catch (error) {
     res.status(400).json({
       message: "some error occured",

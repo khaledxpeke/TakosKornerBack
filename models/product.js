@@ -16,16 +16,16 @@ const ProductSchema = new Mongoose.Schema({
     default:
       "https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
   },
-  currency: {
-    type: String,
-  },
+  // currency: {
+  //   type: String,
+  // },
   category: {
     type: Mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
-  supplements: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Supplement" }],
-  ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
+  // supplements: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Supplement" }],
+  // ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
   type : [{
     type: Mongoose.Schema.Types.ObjectId,
     ref: "Type",
@@ -42,10 +42,10 @@ const ProductSchema = new Mongoose.Schema({
     enum: ["seul", "multiple"],
     required: true,
   },
-  rules : [{
-    type: Mongoose.Schema.Types.ObjectId,
-    ref: "Rule",
-  }],
+  // rules : [{
+  //   type: Mongoose.Schema.Types.ObjectId,
+  //   ref: "Rule",
+  // }],
   maxExtras:{
     type: Number,
   },

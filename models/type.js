@@ -11,7 +11,19 @@ const typeSchema = mongoose.Schema({
     isRequired: {
       type: Boolean,
       default: false,
-    }
+    },
+    payment: {
+      type: String,
+      default: false,
+    },
+    selection: {
+      type: String,
+      default: false,
+    },
+    quantity : {
+      type: Number,
+      default: 1,
+    },
   });
   
   module.exports = mongoose.model("Type", typeSchema);
