@@ -15,6 +15,15 @@ const settingsSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  maxExtras:{
+    type: Number,
+  },
+  maxDessert:{
+    type: Number,
+  },
+  maxDrink:{
+    type: Number,
+  },
 });
 
 module.exports = mongoose.model("Settings", settingsSchema);

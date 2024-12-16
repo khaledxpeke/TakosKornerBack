@@ -127,7 +127,7 @@ exports.deleteCurrency = async (req, res) => {
 
 exports.updateCurrencyOrTva = async (req, res) => {
   try {
-    const { oldCurrency, newCurrency, tva } = req.body;
+    const { oldCurrency, newCurrency, tva, maxExtras,maxDessert,maxDrink } = req.body;
 
     const settings = await Settings.findOne();
     if (!settings) {
@@ -160,6 +160,10 @@ exports.updateCurrencyOrTva = async (req, res) => {
         return res.status(400).json({ message: "TVA must be a positive number" });
       }
       settings.tva = tva;
+      settings.maxExtras = maxExtras || settings.maxExtras;
+      settings.maxDessert = maxDessert || settings.maxDessert;
+      settings.maxDrink = maxDrink || settings.maxDrink;
+
     }
 
     await settings.save();
