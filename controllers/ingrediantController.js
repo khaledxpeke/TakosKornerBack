@@ -29,7 +29,7 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeIds,price ,inStock, suppPrice} = req.body;
+    const { name, typeIds,price ,outOfStock, suppPrice} = req.body;
     const userId = req.user.user._id;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
@@ -49,7 +49,7 @@ exports.createIngredient = async (req, res, next) => {
         name,
         image,
         types: typesArray,
-        inStock,
+        outOfStock,
         suppPrice,
         createdBy: userId,
       });
@@ -186,7 +186,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, types,price,inStock,suppPrice} = req.body;
+    const { name, types,price,outOfStock,suppPrice} = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -206,7 +206,7 @@ exports.updateIngrediant = async (req, res) => {
       
       ingrediant.name = name || ingrediant.name;
       ingrediant.types = types || ingrediant.types;
-      ingrediant.inStock = inStock || ingrediant.inStock;
+      ingrediant.outOfStock = outOfStock || ingrediant.outOfStock;
       ingrediant.suppPrice = suppPrice || ingrediant.suppPrice;
       if (price !== undefined) {
         ingrediant.price = price !== "" ? price : null;

@@ -32,7 +32,7 @@ const ingrediantSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-  inStock: {
+  outOfStock: {
     type: Boolean,
     default: false,
   },
