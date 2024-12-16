@@ -6,6 +6,7 @@ app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
+const Ingrediant = require("../models/ingrediant");
 
 const upload = multer({ storage: multerStorage });
 exports.createCategory = async (req, res) => {
@@ -50,20 +51,47 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().populate({
       path: "products",
-      populate: [
-        {
-          path: "type",
-          select: "name message isRequired payment selection quantity",
-          populate: {
-            path: "ingrediants",
-            model: "Ingrediant",
-            select: "name image price suppPrice outOfStock",
-            match: { outOfStock: false }
-          }
-        }
-      ]
+      select: "name price image type choice",
+      populate: {
+        path: "type",
+        select: "name message isRequired selection payment quantity"
+      }
     });
-    res.status(200).json(categories);
+    const populatedCategories = await Promise.all(categories.map(async (category) => {
+      const categoryObj = category.toObject();
+      
+      categoryObj.products = await Promise.all(category.products.map(async (product) => {
+        const productObj = product.toObject();
+        
+        productObj.type = await Promise.all(product.type.map(async (type) => {
+          const typeObj = type.toObject();
+          
+          const typeIngredients = await Ingrediant.find({
+            types: type._id,
+            outOfStock: false
+          }).select("name image price suppPrice outOfStock");
+          
+          typeObj.ingrediants = typeIngredients.map(ing => {
+            // const ingObj = ing.toObject();
+            // If payment is false, use suppPrice instead of price
+            const calculatedPrice = !type.payment ? ing.suppPrice : ing.price;
+            return {
+              _id: ing._id,
+              name: ing.name,
+              image: ing.image,
+              price: calculatedPrice,
+              outOfStock: ing.outOfStock
+            };
+          });
+          return typeObj;
+        }));
+        
+        return productObj;
+      }));
+      
+      return categoryObj;
+    }));
+    res.status(200).json(populatedCategories);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

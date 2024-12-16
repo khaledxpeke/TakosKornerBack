@@ -35,7 +35,9 @@ exports.addProductToCategory = async (req, res, next) => {
     const image = `uploads/${req.file?.filename}`|| ""; ;
     const { currency, choice } = req.body;
     // const ingrediantIds = req.body.ingrediants?.split(",") || [];
-    const typeIds = req.body.type ? JSON.parse(req.body.type) : []; 
+    const typeIds = req.body.type || []; 
+    console.log("typeIds"+typeIds);
+    console.log(req.body.type);
     // const rules = JSON.parse(req.body.rules) || [];
     // const supplementIds = req.body.supplements?.split(",") || [];
     const rulesIds = [];
