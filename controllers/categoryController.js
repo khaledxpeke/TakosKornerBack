@@ -51,7 +51,7 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().populate({
       path: "products",
-      select: "name price image type choice",
+      select: "name price image type choice description",
       populate: {
         path: "type",
         select: "name message isRequired selection payment quantity"

@@ -3,8 +3,10 @@ const Settings = require("./settings");
 const ProductSchema = new Mongoose.Schema({
   name: {
     type: String,
-    unique: true,
     required: true,
+  },
+  description: {
+    type: String,
   },
   price: {
     type: Number,

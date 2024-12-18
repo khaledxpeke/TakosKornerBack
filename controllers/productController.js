@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = `uploads/${req.file?.filename}`|| ""; ;
-    const { currency, choice } = req.body;
+    const { currency, choice,description } = req.body;
     // const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || []; 
     console.log("typeIds"+typeIds);
@@ -60,6 +60,7 @@ exports.addProductToCategory = async (req, res, next) => {
         // }
         const product = new Product({
           name,
+          description,
           price,
           category: categoryId,
           // currency,
