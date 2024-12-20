@@ -29,13 +29,13 @@ const historySchema = mongoose.Schema({
         },
       ],
       total: { type: Number },
-      currency: { type: String },
-    }, 
+    },
   ],
   pack: {
     type: String,
     required: true,
   },
+  currency: { type: String },
   method: {
     type: String,
     required: true,
