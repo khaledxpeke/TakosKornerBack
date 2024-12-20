@@ -9,7 +9,8 @@ app.use(express.json());
 const transporter = require("../middleware/email");
 
 exports.addHistory = async (req, res) => {
-  const { products, pack, name, method, total, currency, commandNumber } = req.body;
+  const { products, pack, name, method, total, currency, commandNumber } =
+    req.body;
   try {
     const history = await new History({
       product: products.map((product) => {
@@ -153,6 +154,53 @@ exports.getLast10Orders = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
     throw error;
+  }
+};
+
+exports.addEmail = async (req, res) => {
+  const { email, commandNumber } = req.body;
+  try {
+    const history = await History.findOne({ commandNumber });
+    const mailOptions = {
+      from: "khaledbouajila5481@gmail.com",
+      to: email,
+      subject: "Ticket de commande",
+      text: "",
+      template: "/template/index",
+      context: {
+        commandNumber: commandNumber,
+        name: history.name,
+        products: history.product.map((product) => {
+          return {
+            platName: product.plat.name,
+            currency: product.plat.currency,
+            price: product.plat.price,
+            addons: product.addons.map((addon) => {
+              return {
+                name: addon.name,
+                count: addon.count,
+                total: addon.total,
+                currency: product.plat.currency,
+              };
+            }),
+            extras: product.extras.map((extra) => {
+              return {
+                name: extra.name,
+                count: extra.count,
+                total: extra.total,
+                currency: product.plat.currency,
+              };
+            }),
+          };
+        }),
+        total: history.total,
+      },
+    };
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Error saving history:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
