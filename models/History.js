@@ -8,7 +8,6 @@ const historySchema = mongoose.Schema({
         category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
         name: { type: String, required: true },
         price: { type: Number },
-        currency: { type: String },
       },
       addons: [
         {
@@ -29,9 +28,15 @@ const historySchema = mongoose.Schema({
           pu: { type: Number },
         },
       ],
-    },
+      total: { type: Number },
+      currency: { type: String },
+    }, 
   ],
   pack: {
+    type: String,
+    required: true,
+  },
+  method: {
     type: String,
     required: true,
   },
@@ -39,10 +44,10 @@ const historySchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  email: {
-    type: String,
-    required: true,
-  },
+  // email: {
+  //   type: String,
+  //   required: true,
+  // },
   total: {
     type: String,
     required: true,

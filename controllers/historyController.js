@@ -9,61 +9,104 @@ app.use(express.json());
 const transporter = require("../middleware/email");
 
 exports.addHistory = async (req, res) => {
-  const { products, pack, name, email, total, commandNumber } = req.body;
-  const decodedList = JSON.parse(products);
+  const { products, pack, name, method, total, commandNumber } = req.body;
   const history = await new History({
-    product: decodedList.map((product) => ({
+    product: products.map((product) => {
+    const uniqueAddons = Object.values(
+      product.addons.reduce((acc, addon) => {
+        const key = `${addon.name}-${addon.price}`;
+        if (!acc[key]) {
+          acc[key] = {
+            _id: addon._id,
+            name: addon.name,
+            price: addon.price,
+            pu: addon.price,
+            count: 0
+          };
+        }
+        acc[key].count += 1;
+        return acc;
+      }, {})
+    );
+    const uniqueExtras = Object.values(
+      product.extras.reduce((acc, extra) => {
+        const key = `${extra.name}-${extra.price}`;
+        if (!acc[key]) {
+          acc[key] = {
+            _id: extra._id,
+            name: extra.name,
+            price: extra.price,
+            pu: extra.price,
+            count: 0
+          };
+        }
+        acc[key].count += 1;
+        return acc;
+      }, {})
+    );
+    return {
       plat: product.plat,
-      addons: product.addons.map((addon) => {
-        const count = product.addons.filter(
-          (a) => a.id === addon.id && a.price === addon.price
-        ).length;
-        return { ...addon, count }; 
-      }),
-      extras: product.extras,
-    })),
+      currency: product.currency,
+      total: product.total,
+      addons: uniqueAddons.map(addon => ({
+        _id: addon._id,
+        name: addon.name,
+        pu: addon.price,
+        count: addon.count,
+        total: addon.price * addon.count
+      })),
+      extras: uniqueExtras.map(extra => ({
+        _id: extra._id,
+        name: extra.name,
+        pu: extra.price,
+        count: extra.count,
+        total: extra.price * extra.count
+      }))
+    };
+  }),
     pack,
     name,
-    email,
+    // email,
+    method,
     total,
     commandNumber: parseInt(commandNumber, 10),
   });
-  const mailOptions = {
-    from: "khaledbouajila5481@gmail.com",
-    to: email,
-    subject: "Ticket de commande",
-    text: "",
-    template: "/template/index",
-    context: {
-      commandNumber: commandNumber,
-      name: name,
-      products: history.product.map((product) => {
-        return {
-          platName: product.plat.name,
-          currency: product.plat.currency,
-          price: product.plat.price,
-          addons: product.addons.map((addon) => {
-            return {
-              name: addon.name,
-              count: addon.count,
-              total: addon.total,
-              currency: product.plat.currency,
-            };
-          }),
-          extras: product.extras.map((extra) => {
-            return {
-              name: extra.name,
-              count: extra.count,
-              total: extra.total,
-              currency: product.plat.currency,
-            };
-          }),
-        };
-      }),
-      total: total,
-    },
-  };
-  await transporter.sendMail(mailOptions);
+  // const mailOptions = {
+  //   from: "khaledbouajila5481@gmail.com",
+  //   to: email,
+  //   subject: "Ticket de commande",
+  //   text: "",
+  //   template: "/template/index",
+  //   context: {
+  //     commandNumber: commandNumber,
+  //     name: name,
+  //     products: history.product.map((product) => {
+  //       return {
+  //         platName: product.plat.name,
+  //         currency: product.plat.currency,
+  //         price: product.plat.price,
+  //         addons: product.addons.map((addon) => {
+  //           return {
+  //             name: addon.name,
+  //             count: addon.count,
+  //             total: addon.total,
+  //             currency: product.plat.currency,
+  //           };
+  //         }),
+  //         extras: product.extras.map((extra) => {
+  //           return {
+  //             name: extra.name,
+  //             count: extra.count,
+  //             total: extra.total,
+  //             currency: product.plat.currency,
+  //           };
+  //         }),
+  //       };
+  //     }),
+  //     total: total,
+  //   },
+  // };
+  // await transporter.sendMail(mailOptions);
   history
     .save()
     .then((result) => {
