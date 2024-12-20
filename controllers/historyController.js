@@ -14,7 +14,12 @@ exports.addHistory = async (req, res) => {
   const history = await new History({
     product: decodedList.map((product) => ({
       plat: product.plat,
-      addons: product.addons,
+      addons: product.addons.map((addon) => {
+        const count = product.addons.filter(
+          (a) => a.id === addon.id && a.price === addon.price
+        ).length;
+        return { ...addon, count }; 
+      }),
       extras: product.extras,
     })),
     pack,
