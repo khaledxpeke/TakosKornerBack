@@ -36,8 +36,6 @@ exports.addProductToCategory = async (req, res, next) => {
     const { currency, choice,description } = req.body;
     // const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || []; 
-    console.log("typeIds"+typeIds);
-    console.log(req.body.type);
     // const rules = JSON.parse(req.body.rules) || [];
     // const supplementIds = req.body.supplements?.split(",") || [];
     const rulesIds = [];
