@@ -51,7 +51,7 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().populate({
       path: "products",
-      select: "name price image type choice description category",
+      select: "name price image type choice description category outOfStock visible",
       populate: {
         path: "type",
         select: "name message isRequired selection payment quantity"
@@ -60,7 +60,8 @@ exports.getAllCategories = async (req, res) => {
     const populatedCategories = await Promise.all(categories.map(async (category) => {
       const categoryObj = category.toObject();
       
-      categoryObj.products = await Promise.all(category.products.map(async (product) => {
+      categoryObj.products = await Promise.all(category.products.filter(product => !product.outOfStock && product.visible !== false) 
+      .map(async (product) => {
         const productObj = product.toObject();
         
         productObj.type = await Promise.all(product.type.map(async (type) => {

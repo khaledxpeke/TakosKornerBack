@@ -44,6 +44,14 @@ const ProductSchema = new Mongoose.Schema({
     enum: ["seul", "multiple"],
     required: true,
   },
+  outOfStock: {
+    type: Boolean,
+    default: false,
+  },
+  visible: {
+    type: Boolean,
+    default: true,
+  },
   // rules : [{
   //   type: Mongoose.Schema.Types.ObjectId,
   //   ref: "Rule",

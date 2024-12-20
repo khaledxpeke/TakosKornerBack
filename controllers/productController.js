@@ -33,7 +33,7 @@ exports.addProductToCategory = async (req, res, next) => {
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
     const image = `uploads/${req.file?.filename}`|| ""; ;
-    const { currency, choice,description } = req.body;
+    const { currency, choice,description,outOfStock,visible } = req.body;
     // const ingrediantIds = req.body.ingrediants?.split(",") || [];
     const typeIds = req.body.type || []; 
     // const rules = JSON.parse(req.body.rules) || [];
@@ -61,6 +61,8 @@ exports.addProductToCategory = async (req, res, next) => {
           description,
           price,
           category: categoryId,
+          outOfStock,
+          visible,
           // currency,
           type: typeIds,
           // rules: rulesIds,
@@ -204,6 +206,8 @@ exports.updateProduct = async (req, res) => {
       name,
       price,
       description,
+      outOfStock,
+      visible,
       // currency,
       supplements,
       ingrediants,
@@ -229,6 +233,8 @@ exports.updateProduct = async (req, res) => {
 
       product.name = name || product.name;
       product.description = description || product.description;
+      product.outOfStock = outOfStock || product.outOfStock;
+      product.visible = visible || product.visible;
       product.price = price || product.price;
       // product.currency = currency || product.currency;
       product.category = category || product.category;
