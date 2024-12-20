@@ -165,7 +165,6 @@ exports.getCommandNumber = async (req, res) => {
     let lastCommandNumber = lastHistoryEntry
       ? lastHistoryEntry.commandNumber
       : 0;
-    console.log(lastHistoryEntry);
     const lastCommandDate = lastHistoryEntry
       ? lastHistoryEntry.boughtAt
       : currentDate;
