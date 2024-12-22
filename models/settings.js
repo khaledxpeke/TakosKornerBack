@@ -24,6 +24,14 @@ const settingsSchema = new mongoose.Schema({
   maxDrink:{
     type: Number,
   },
+  logo: {
+    type: String,
+    default: "uploads/default-logo.png"
+  },
+  banner: {
+    type: String,
+    default: "uploads/default-banner.png"
+  },
 });
 
 module.exports = mongoose.model("Settings", settingsSchema);

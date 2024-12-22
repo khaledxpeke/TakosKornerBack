@@ -3,6 +3,11 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
+const multer = require("multer");
+const multerStorage = require("../middleware/multerStorage");
+const fs = require("fs");
+const path = require("path");
+const upload = multer({ storage: multerStorage });
 
 exports.addSettings = async (req, res) => {
   try {
@@ -19,13 +24,11 @@ exports.addSettings = async (req, res) => {
 
       existing.currencies.push(currency.toUpperCase());
 
-        await existing.save();
-        return res.status(200).json(existing);
+      await existing.save();
+      return res.status(200).json(existing);
     } else {
-      if (currency === undefined ) {
-        return res
-          .status(400)
-          .json({ message: "Currency is required" });
+      if (currency === undefined) {
+        return res.status(400).json({ message: "Currency is required" });
       }
       const newSettings = new Settings({
         currencies: [currency.toUpperCase()],
@@ -103,7 +106,10 @@ exports.deleteCurrency = async (req, res) => {
     }
 
     const currencyDoc = await Settings.findOne();
-    if (!currencyDoc || !currencyDoc.currencies.includes(currency.toUpperCase())) {
+    if (
+      !currencyDoc ||
+      !currencyDoc.currencies.includes(currency.toUpperCase())
+    ) {
       return res.status(400).json({ message: "Currency not found" });
     }
 
@@ -123,11 +129,12 @@ exports.deleteCurrency = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 exports.updateCurrencyOrTva = async (req, res) => {
   try {
-    const { oldCurrency, newCurrency, tva, maxExtras,maxDessert,maxDrink } = req.body;
+    const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink } =
+      req.body;
 
     const settings = await Settings.findOne();
     if (!settings) {
@@ -139,11 +146,15 @@ exports.updateCurrencyOrTva = async (req, res) => {
       const newCurrencyUpper = newCurrency.toUpperCase();
 
       if (!settings.currencies.includes(oldCurrencyUpper)) {
-        return res.status(400).json({ message: "Old currency not found in the list" });
+        return res
+          .status(400)
+          .json({ message: "Old currency not found in the list" });
       }
 
       if (settings.currencies.includes(newCurrencyUpper)) {
-        return res.status(400).json({ message: "New currency already exists in the list" });
+        return res
+          .status(400)
+          .json({ message: "New currency already exists in the list" });
       }
 
       settings.currencies = settings.currencies.map((c) =>
@@ -157,13 +168,14 @@ exports.updateCurrencyOrTva = async (req, res) => {
 
     if (tva !== undefined) {
       if (tva < 0) {
-        return res.status(400).json({ message: "TVA must be a positive number" });
+        return res
+          .status(400)
+          .json({ message: "TVA must be a positive number" });
       }
       settings.tva = tva;
       settings.maxExtras = maxExtras || settings.maxExtras;
       settings.maxDessert = maxDessert || settings.maxDessert;
       settings.maxDrink = maxDrink || settings.maxDrink;
-
     }
 
     await settings.save();
@@ -177,3 +189,67 @@ exports.updateCurrencyOrTva = async (req, res) => {
   }
 };
 
+exports.uploadLogo = async (req, res, next) => {
+  upload.single("logo")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+
+    const oldSettings = await Settings.findOne();
+    const logo = `uploads\\${req.file?.filename}` || "";
+    try {
+      const settings = await Settings.findOneAndUpdate(
+        {},
+        { logo: logo },
+        { new: true, upsert: true }
+      );
+      if (oldSettings?.logo) {
+        const oldPath = path.join(__dirname, '..', oldSettings.logo);
+        if (fs.existsSync(oldPath) && !oldPath.includes('default')) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      res.status(200).json(settings);
+    } catch (error) {
+      if (req.file) {
+        fs.unlinkSync(path.join(__dirname, '..', `uploads\\${req.file.filename}`));
+      }
+      res.status(400).json({ error: error.message });
+    }
+  });
+};
+
+exports.uploadBanner = async (req, res, next) => {
+  upload.single("banner")(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({
+        message: "Image upload failed",
+        error: err.message,
+      });
+    }
+    const oldSettings = await Settings.findOne();
+    const banner = `uploads\\${req.file?.filename}` || "";
+    try {
+      const settings = await Settings.findOneAndUpdate(
+        {},
+        { banner: banner },
+        { new: true, upsert: true }
+      );
+      if (oldSettings?.banner) {
+        const oldPath = path.join(__dirname, '..', oldSettings.banner);
+        if (fs.existsSync(oldPath) && !oldPath.includes('default')) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      res.status(200).json(settings);
+    } catch (error) {
+      if (req.file) {
+        fs.unlinkSync(path.join(__dirname, '..', `uploads\\${req.file.filename}`));
+      }
+      res.status(400).json({ error: error.message });
+    }
+  });
+};
