@@ -3,7 +3,6 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Determine the folder dynamically
     const uploadDir =
       req.uploadTarget === "carousel"
         ? path.join(__dirname, "..", "uploads", "carousel")

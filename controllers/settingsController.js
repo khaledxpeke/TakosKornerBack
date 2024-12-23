@@ -4,10 +4,9 @@ const app = express();
 require("dotenv").config();
 app.use(express.json());
 const multer = require("multer");
-const multerStorage = require("../middleware/multerStorage");
+const multipleUpload = require("../middleware/multipleUpload");
 const fs = require("fs");
 const path = require("path");
-const upload = multer({ storage: multerStorage });
 
 exports.addSettings = async (req, res) => {
   try {
@@ -131,66 +130,66 @@ exports.deleteCurrency = async (req, res) => {
   }
 };
 
-exports.updateCurrencyOrTva = async (req, res) => {
-  try {
-    const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink } =
-      req.body;
+// exports.updateCurrencyOrTva = async (req, res) => {
+//   try {
+//     const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink } =
+//       req.body;
 
-    const settings = await Settings.findOne();
-    if (!settings) {
-      return res.status(404).json({ message: "Settings not found" });
-    }
+//     const settings = await Settings.findOne();
+//     if (!settings) {
+//       return res.status(404).json({ message: "Settings not found" });
+//     }
 
-    if (oldCurrency && newCurrency) {
-      const oldCurrencyUpper = oldCurrency.toUpperCase();
-      const newCurrencyUpper = newCurrency.toUpperCase();
+//     if (oldCurrency && newCurrency) {
+//       const oldCurrencyUpper = oldCurrency.toUpperCase();
+//       const newCurrencyUpper = newCurrency.toUpperCase();
 
-      if (!settings.currencies.includes(oldCurrencyUpper)) {
-        return res
-          .status(400)
-          .json({ message: "Old currency not found in the list" });
-      }
+//       if (!settings.currencies.includes(oldCurrencyUpper)) {
+//         return res
+//           .status(400)
+//           .json({ message: "Old currency not found in the list" });
+//       }
 
-      if (settings.currencies.includes(newCurrencyUpper)) {
-        return res
-          .status(400)
-          .json({ message: "New currency already exists in the list" });
-      }
+//       if (settings.currencies.includes(newCurrencyUpper)) {
+//         return res
+//           .status(400)
+//           .json({ message: "New currency already exists in the list" });
+//       }
 
-      settings.currencies = settings.currencies.map((c) =>
-        c === oldCurrencyUpper ? newCurrencyUpper : c
-      );
+//       settings.currencies = settings.currencies.map((c) =>
+//         c === oldCurrencyUpper ? newCurrencyUpper : c
+//       );
 
-      if (settings.defaultCurrency === oldCurrencyUpper) {
-        settings.defaultCurrency = newCurrencyUpper;
-      }
-    }
+//       if (settings.defaultCurrency === oldCurrencyUpper) {
+//         settings.defaultCurrency = newCurrencyUpper;
+//       }
+//     }
 
-    if (tva !== undefined) {
-      if (tva < 0) {
-        return res
-          .status(400)
-          .json({ message: "TVA must be a positive number" });
-      }
-      settings.tva = tva;
-      settings.maxExtras = maxExtras || settings.maxExtras;
-      settings.maxDessert = maxDessert || settings.maxDessert;
-      settings.maxDrink = maxDrink || settings.maxDrink;
-    }
+//     if (tva !== undefined) {
+//       if (tva < 0) {
+//         return res
+//           .status(400)
+//           .json({ message: "TVA must be a positive number" });
+//       }
+//       settings.tva = tva;
+//       settings.maxExtras = maxExtras || settings.maxExtras;
+//       settings.maxDessert = maxDessert || settings.maxDessert;
+//       settings.maxDrink = maxDrink || settings.maxDrink;
+//     }
 
-    await settings.save();
+//     await settings.save();
 
-    res.status(200).json({
-      message: "Settings updated successfully",
-      settings,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//     res.status(200).json({
+//       message: "Settings updated successfully",
+//       settings,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
-exports.uploadLogo = async (req, res, next) => {
-  upload.single("logo")(req, res, async (err) => {
+exports.updateSettings = async (req, res) => {
+  multipleUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
         message: "Image upload failed",
@@ -198,58 +197,86 @@ exports.uploadLogo = async (req, res, next) => {
       });
     }
 
-    const oldSettings = await Settings.findOne();
-    const logo = `uploads\\${req.file?.filename}` || "";
     try {
-      const settings = await Settings.findOneAndUpdate(
-        {},
-        { logo: logo },
-        { new: true, upsert: true }
-      );
-      if (oldSettings?.logo) {
-        const oldPath = path.join(__dirname, '..', oldSettings.logo);
-        if (fs.existsSync(oldPath) && !oldPath.includes('default')) {
-          fs.unlinkSync(oldPath);
-        }
-      }
-      res.status(200).json(settings);
-    } catch (error) {
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, '..', `uploads\\${req.file.filename}`));
-      }
-      res.status(400).json({ error: error.message });
-    }
-  });
-};
+      const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink } =
+        req.body;
+      const settings = await Settings.findOne();
 
-exports.uploadBanner = async (req, res, next) => {
-  upload.single("banner")(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({
-        message: "Image upload failed",
-        error: err.message,
-      });
-    }
-    const oldSettings = await Settings.findOne();
-    const banner = `uploads\\${req.file?.filename}` || "";
-    try {
-      const settings = await Settings.findOneAndUpdate(
-        {},
-        { banner: banner },
-        { new: true, upsert: true }
-      );
-      if (oldSettings?.banner) {
-        const oldPath = path.join(__dirname, '..', oldSettings.banner);
-        if (fs.existsSync(oldPath) && !oldPath.includes('default')) {
-          fs.unlinkSync(oldPath);
+      if (!settings) {
+        return res.status(404).json({ message: "Settings not found" });
+      }
+
+      if (oldCurrency && newCurrency) {
+        const oldCurrencyUpper = oldCurrency.toUpperCase();
+        const newCurrencyUpper = newCurrency.toUpperCase();
+
+        if (!settings.currencies.includes(oldCurrencyUpper)) {
+          return res.status(400).json({ message: "Old currency not found" });
+        }
+        if (settings.currencies.includes(newCurrencyUpper)) {
+          return res
+            .status(400)
+            .json({ message: "New currency already exists" });
+        }
+
+        settings.currencies = settings.currencies.map((c) =>
+          c === oldCurrencyUpper ? newCurrencyUpper : c
+        );
+        if (settings.defaultCurrency === oldCurrencyUpper) {
+          settings.defaultCurrency = newCurrencyUpper;
         }
       }
-      res.status(200).json(settings);
-    } catch (error) {
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, '..', `uploads\\${req.file.filename}`));
+
+      if (tva !== undefined) {
+        if (tva < 0) {
+          return res.status(400).json({ message: "TVA must be positive" });
+        }
+        settings.tva = tva;
+        settings.maxExtras = maxExtras || settings.maxExtras;
+        settings.maxDessert = maxDessert || settings.maxDessert;
+        settings.maxDrink = maxDrink || settings.maxDrink;
       }
-      res.status(400).json({ error: error.message });
+
+      // Handle logo upload
+      if (req.files?.logo) {
+        const logo = `uploads\\${req.files.logo[0].filename}`;
+        if (settings.logo) {
+          const oldPath = path.join(__dirname, "..", settings.logo);
+
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+          }
+        }
+        settings.logo = logo;
+      }
+
+      if (req.files?.banner) {
+        const banner = `uploads\\${req.files.banner[0].filename}`;
+        if (settings.banner) {
+          const oldPath = path.join(__dirname, "..", settings.banner);
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+          }
+        }
+        settings.banner = banner;
+      }
+
+      await settings.save();
+      res.status(200).json({
+        message: "Settings updated successfully",
+        settings,
+      });
+    } catch (error) {
+      if (req.files) {
+        Object.values(req.files).forEach((files) => {
+          files.forEach((file) => {
+            fs.unlinkSync(
+              path.join(__dirname, "..", `uploads\\${file.filename}`)
+            );
+          });
+        });
+      }
+      res.status(500).json({ error: error.message });
     }
   });
 };
