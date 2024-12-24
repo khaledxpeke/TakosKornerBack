@@ -58,6 +58,12 @@ const historySchema = mongoose.Schema({
     type: String,
     default: "uploads/logo.png",
   },
+  totalWithTVA: {
+    type: Number,
+  },
+  tva: {
+    type: Number,
+  },
   boughtAt: {
     type: Date,
     default: Date.now,

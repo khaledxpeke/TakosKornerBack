@@ -8,12 +8,15 @@ const transporter = require("../middleware/email");
 var pdf = require("pdf-creator-node");
 const path = require('path');
 var fs = require("fs");
-const settings = require("../models/settings");
+const Settings = require("../models/settings");
 
 exports.addHistory = async (req, res) => {
   const { products, pack, name, method, total, currency, commandNumber } =
     req.body;
   try {
+    const settings = await Settings.findOne();
+    const tva = settings?.tva || 0;
+    const totalWithTVA = total * (1 + tva/100);
     const history = await new History({
       product: products.map((product) => {
         const uniqueAddons = Object.values(
@@ -70,9 +73,12 @@ exports.addHistory = async (req, res) => {
       pack,
       name,
       currency,
+      tva,
+      logo: settings.logo,
       // email,
       method,
       total,
+      totalWithTVA,
       commandNumber: parseInt(commandNumber, 10),
     });
     // const mailOptions = {
@@ -161,7 +167,11 @@ exports.getLast10Orders = async (req, res) => {
 
 const generatePDF = async (orderData) => {
   const html = fs.readFileSync(path.join(__dirname, '../template/index.handlebars'), 'utf8');
-  
+  const settings = await Settings.findOne();
+    const tva = settings?.tva || 0;
+    const totalWithTVA = orderData.total * (1 + tva/100);
+    const tvaAmount = orderData.total * (tva/100);
+    const logoUrl = `${process.env.BASE_URL}/api/${settings.logo.replace(/\\/g, '/')}`;
   const options = {
     format: 'A4',
     orientation: 'portrait',
@@ -187,6 +197,7 @@ const generatePDF = async (orderData) => {
     html: html,
     data: {
       name: orderData.name,
+      apiUrl: process.env.BASE_URL,
       commandNumber: orderData.commandNumber,
       boughtAt: orderData.boughtAt.toLocaleDateString('fr-FR', {
         year: 'numeric',
@@ -215,6 +226,10 @@ const generatePDF = async (orderData) => {
         };
       }),
       total: orderData.total,
+      totalWithTVA: totalWithTVA.toFixed(2),
+      tvaAmount: tvaAmount.toFixed(2),
+      tva: tva,
+      logo: logoUrl,
       pack: orderData.pack,
       method: orderData.method,
       currency: orderData.currency
@@ -238,7 +253,10 @@ exports.addEmail = async (req, res) => {
     if (!history) {
       return res.status(404).json({ message: "Order not found" });
     }
-    const settings = await settings.findOne();
+    const settings = await Settings.findOne();
+    const tva = settings?.tva || 0;
+    const totalWithTVA = history.total * (1 + tva/100);
+    const tvaAmount = history.total * (tva/100);
     const orderDate = new Date(history.boughtAt).setHours(0, 0, 0, 0);
     const today = new Date().setHours(0, 0, 0, 0);
     if (orderDate < today) {
@@ -246,6 +264,8 @@ exports.addEmail = async (req, res) => {
         message: "Cannot send email for orders from previous days" 
       });
     }
+    const logoUrl = `${process.env.BASE_URL}/api/${settings.logo.replace(/\\/g, '/')}`;
+    console.log(logoUrl);
     const pdfPath = await generatePDF(history);
     const mailOptions = {
       from: "khaledbouajila5481@gmail.com",
@@ -258,8 +278,10 @@ exports.addEmail = async (req, res) => {
         path: pdfPath
       }],
       context: {
+        apiUrl: process.env.BASE_URL,
         commandNumber: commandNumber,
-        logo: settings.logo,
+        logo: logoUrl,
+        isEmail: true,
         name: history.name,
         boughtAt: history.boughtAt.toLocaleDateString('fr-FR', {
           year: 'numeric',
@@ -292,6 +314,9 @@ exports.addEmail = async (req, res) => {
           };
         }),
         total: history.total,
+        totalWithTVA: totalWithTVA.toFixed(2),
+        tvaAmount: tvaAmount.toFixed(2),
+        tva: tva,
         pack: history.pack,
         method: history.method,
         currency: history.currency,
