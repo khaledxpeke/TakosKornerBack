@@ -94,7 +94,7 @@ exports.deleteMedia = async (req, res) => {
     }
 
     fs.unlinkSync(path.join(__dirname, '..', media.fileUrl));
-    await media.remove();
+    await CarouselMedia.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: 'Media deleted successfully' });
   } catch (error) {
