@@ -69,8 +69,9 @@ exports.getAllCategories = async (req, res) => {
           
           const typeIngredients = await Ingrediant.find({
             types: type._id,
-            outOfStock: false
-          }).select("name image price suppPrice outOfStock");
+            outOfStock: false,
+            visible: true
+          }).select("name image price suppPrice outOfStock visible");
           
           typeObj.ingrediants = typeIngredients.map(ing => {
 
