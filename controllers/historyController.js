@@ -167,7 +167,19 @@ const generatePDF = async (orderData) => {
     border: '10mm',
     footer: {
       height: '10mm'
-    }
+    },
+    type: "pdf",
+    localUrlAccess: true,
+    css: `
+      body {
+        font-family: Arial, sans-serif;
+        font-style: normal;
+      }
+      * {
+        font-style: normal !important;
+        font-family: Arial, sans-serif !important;
+      }
+    `
   };
 
   const document = {
@@ -175,8 +187,34 @@ const generatePDF = async (orderData) => {
     data: {
       name: orderData.name,
       commandNumber: orderData.commandNumber,
-      products: orderData.products,
+      boughtAt: orderData.boughtAt.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      products: orderData.product.map((product) => {
+        return {
+          platName: product.plat.name,
+          price: product.plat.price,
+          addons: product.addons.map((addon) => ({
+            name: addon.name,
+            count: addon.count,
+            total: addon.total,
+            currency: orderData.currency,
+          })),
+          extras: product.extras.map((extra) => ({
+            name: extra.name,
+            count: extra.count,
+            total: extra.total,
+            currency: orderData.currency,
+          })),
+        };
+      }),
       total: orderData.total,
+      pack: orderData.pack,
+      method: orderData.method,
       currency: orderData.currency
     },
     path: `./uploads/order-${orderData.commandNumber}.pdf`
@@ -219,14 +257,13 @@ exports.addEmail = async (req, res) => {
         products: history.product.map((product) => {
           return {
             platName: product.plat.name,
-            currency: product.plat.currency,
             price: product.plat.price,
             addons: product.addons.map((addon) => {
               return {
                 name: addon.name,
                 count: addon.count,
                 total: addon.total,
-                currency: product.plat.currency,
+                currency: history.currency,
               };
             }),
             extras: product.extras.map((extra) => {
@@ -234,7 +271,7 @@ exports.addEmail = async (req, res) => {
                 name: extra.name,
                 count: extra.count,
                 total: extra.total,
-                currency: product.plat.currency,
+                currency: history.currency,
               };
             }),
           };
@@ -242,6 +279,7 @@ exports.addEmail = async (req, res) => {
         total: history.total,
         pack: history.pack,
         method: history.method,
+        currency: history.currency,
       },
     };
     await transporter.sendMail(mailOptions);
