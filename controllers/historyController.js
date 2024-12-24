@@ -2,11 +2,12 @@ const History = require("../models/History");
 const Product = require("../models/product");
 const express = require("express");
 const app = express();
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const jwtSecret = process.env.JWT_SECRET;
 app.use(express.json());
 const transporter = require("../middleware/email");
+var pdf = require("pdf-creator-node");
+const path = require('path');
+var fs = require("fs");
 
 exports.addHistory = async (req, res) => {
   const { products, pack, name, method, total, currency, commandNumber } =
@@ -157,16 +158,54 @@ exports.getLast10Orders = async (req, res) => {
   }
 };
 
+const generatePDF = async (orderData) => {
+  const html = fs.readFileSync(path.join(__dirname, '../template/index.handlebars'), 'utf8');
+  
+  const options = {
+    format: 'A4',
+    orientation: 'portrait',
+    border: '10mm',
+    footer: {
+      height: '10mm'
+    }
+  };
+
+  const document = {
+    html: html,
+    data: {
+      name: orderData.name,
+      commandNumber: orderData.commandNumber,
+      products: orderData.products,
+      total: orderData.total,
+      currency: orderData.currency
+    },
+    path: `./uploads/order-${orderData.commandNumber}.pdf`
+  };
+
+  try {
+    await pdf.create(document, options);
+    return document.path;
+  } catch (error) {
+    console.error('PDF Generation Error:', error);
+    throw error;
+  }
+};
+
 exports.addEmail = async (req, res) => {
   const { email, commandNumber } = req.body;
   try {
     const history = await History.findOne({ commandNumber });
+    const pdfPath = await generatePDF(history);
     const mailOptions = {
       from: "khaledbouajila5481@gmail.com",
       to: email,
       subject: "Ticket de commande",
       text: "",
       template: "/template/index",
+      attachments: [{
+        filename: `order-${history.commandNumber}.pdf`,
+        path: pdfPath
+      }],
       context: {
         commandNumber: commandNumber,
         name: history.name,
@@ -197,6 +236,7 @@ exports.addEmail = async (req, res) => {
       },
     };
     await transporter.sendMail(mailOptions);
+    fs.unlinkSync(pdfPath);
     res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
     console.error("Error saving history:", error);
