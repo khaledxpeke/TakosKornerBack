@@ -119,7 +119,7 @@
 														<tr>
 															<td class="pad">
 																<div style="color:#ffffff;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:24px;line-height:120%;text-align:center;mso-line-height-alt:28.799999999999997px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">merci <strong>Helmi</strong>,&nbsp;pour votre commande.</span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">merci <strong>{{name}}</strong>,&nbsp;pour votre commande.</span></p>
 																</div>
 															</td>
 														</tr>
@@ -128,7 +128,7 @@
 														<tr>
 															<td class="pad">
 																<div style="color:#ffffff;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:24px;line-height:120%;text-align:center;mso-line-height-alt:28.799999999999997px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">January 15, 6:02 pm</span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">{{boughtAt}}</span></p>
 																</div>
 															</td>
 														</tr>
@@ -183,7 +183,7 @@
 														<tr>
 															<td class="pad">
 																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0;">Commande N° <strong>16</strong></p>
+																	<p style="margin: 0;">Commande N° <strong>{{commandNumber}}</strong></p>
 																</div>
 															</td>
 														</tr>
@@ -192,7 +192,7 @@
 														<tr>
 															<td class="pad">
 																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0;"><strong>Sur place</strong></p>
+																	<p style="margin: 0;"><strong>{{pack}}</strong></p>
 																</div>
 															</td>
 														</tr>
@@ -201,7 +201,7 @@
 														<tr>
 															<td class="pad">
 																<div style="color:#101112;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0;">Méthode de payment: <strong>Carte</strong></p>
+																	<p style="margin: 0;">Méthode de payment: <strong>{{method}}</strong></p>
 																</div>
 															</td>
 														</tr>
@@ -217,6 +217,7 @@
 					</table>
 					<table class="row row-4" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
 						<tbody>
+							{{#each products}}
 							<tr>
 								<td>
 									<table class="row-content" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #bd3c3c; color: #000000; width: 640px; margin: 0 auto;" width="640">
@@ -227,28 +228,21 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:30px;padding-right:10px;padding-top:10px;">
 																<div style="color:#232323;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><strong><span style="word-break: break-word;">BUILD YOUR OWN</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><strong><span style="word-break: break-word;">{{platName}}</span></strong></span></p>
 																</div>
 															</td>
 														</tr>
 													</table>
 													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+														{{#each addons}}
 														<tr>
 															<td class="pad" style="padding-left:30px;padding-right:10px;">
 																<div style="color:#232323;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;line-height:120%;text-align:left;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><strong>X2</strong></span> bbq sauce</span></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><strong>X{{count}}</strong></span> {{name}}</span></span></p>
 																</div>
 															</td>
 														</tr>
-													</table>
-													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
-														<tr>
-															<td class="pad" style="padding-left:30px;padding-right:10px;">
-																<div style="color:#232323;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;line-height:120%;text-align:left;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><strong>X2</strong></span> bbq sauce</span></span></p>
-																</div>
-															</td>
-														</tr>
+														{{/each}}
 													</table>
 													<table class="paragraph_block block-4" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
@@ -260,13 +254,15 @@
 														</tr>
 													</table>
 													<table class="paragraph_block block-5" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+														{{#each extras}}
 														<tr>
 															<td class="pad" style="padding-left:30px;padding-right:10px;">
 																<div style="color:#232323;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;line-height:120%;text-align:left;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><strong>X2</strong></span> bbq sauce</span></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><span style="word-break: break-word;"><strong>X{{count}}</strong></span> {{name}}</span></span></p>
 																</div>
 															</td>
 														</tr>
+														{{/each}}
 													</table>
 												</td>
 												<td class="column column-2" width="33.333333333333336%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; background-color: #f2f2f2; border-right: 25px solid #A30C2F; vertical-align: top; border-top: 0px; border-bottom: 0px; border-left: 0px;">
@@ -274,38 +270,33 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-right:30px;padding-top:10px;">
 																<div style="color:#555555;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;line-height:120%;text-align:right;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">$ 9.79</span></p>
+																	<p style="margin: 0; word-break: break-word;"><span style="word-break: break-word;">{{price}}{{currency}}</span></p>
 																</div>
 															</td>
 														</tr>
 													</table>
 													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+														{{#each addons}}
 														<tr>
 															<td class="pad" style="padding-right:25px;">
 																<div style="color:#444a5b;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:right;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0;">$ 9.79</p>
+																	<p style="margin: 0;">{{total}}{{currency}}</p>
 																</div>
 															</td>
 														</tr>
-													</table>
-													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
-														<tr>
-															<td class="pad" style="padding-right:25px;">
-																<div style="color:#444a5b;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:right;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0;">$ 9.79</p>
-																</div>
-															</td>
-														</tr>
+														{{/each}}
 													</table>
 													<div class="spacer_block block-4" style="height:29px;line-height:29px;font-size:1px;">&#8202;</div>
 													<table class="paragraph_block block-5" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+														{{#each extras}}
 														<tr>
 															<td class="pad" style="padding-right:25px;">
 																<div style="color:#444a5b;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:right;mso-line-height-alt:16.8px;">
-																	<p style="margin: 0;">$ 9.79</p>
+																	<p style="margin: 0;">{{total}}{{currency}}</p>
 																</div>
 															</td>
 														</tr>
+														{{/each}}
 													</table>
 												</td>
 											</tr>
@@ -313,6 +304,7 @@
 									</table>
 								</td>
 							</tr>
+							{{/each}}
 						</tbody>
 					</table>
 					<table class="row row-5" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
@@ -376,7 +368,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:30px;padding-right:10px;padding-top:10px;">
 																<div style="color:#232323;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0; word-break: break-word;"><strong><span style="word-break: break-word;"><span style="word-break: break-word;">TOTAL</span></span></strong></p>
+																	<p style="margin: 0; word-break: break-word;"><strong><span style="word-break: break-word;"><span style="word-break: break-word;">Total</span></span></strong></p>
 																</div>
 															</td>
 														</tr>
@@ -387,7 +379,7 @@
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-right:30px;padding-top:10px;">
 																<div style="color:#555555;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;line-height:120%;text-align:right;mso-line-height-alt:19.2px;">
-																	<p style="margin: 0; word-break: break-word;"><strong><span style="word-break: break-word;">$ 27.00</span></strong></p>
+																	<p style="margin: 0; word-break: break-word;"><strong><span style="word-break: break-word;">{{total}}{{currency}}</span></strong></p>
 																</div>
 															</td>
 														</tr>
