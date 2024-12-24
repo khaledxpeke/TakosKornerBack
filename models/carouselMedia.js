@@ -1,12 +1,27 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const carouselMediaSchema = new mongoose.Schema({
-  fileUrl: { type: String, required: true },
-  isActive: { type: Boolean, default: false },
-  position: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now },
-});
+  mediaType: {
+    type: String,
+    enum: ['image', 'video'],
+    required: true
+  },
+  fileUrl: {
+    type: String,
+    required: true
+  },
+  duration: {
+    type: Number,
+    default: 5, // 5 seconds default for images
+    required: function() { return this.mediaType === 'image'; }
+  },
+  order: {
+    type: Number,
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}, { timestamps: false });
 
-const CarouselMedia = mongoose.model("CarouselMedia", carouselMediaSchema);
-
-module.exports = CarouselMedia;
+module.exports = mongoose.model('CarouselMedia', carouselMediaSchema);
