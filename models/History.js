@@ -54,6 +54,10 @@ const historySchema = mongoose.Schema({
   commandNumber: {
     type: Number,
   },
+  logo: {
+    type: String,
+    default: "uploads/logo.png",
+  },
   boughtAt: {
     type: Date,
     default: Date.now,

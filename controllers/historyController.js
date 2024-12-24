@@ -8,6 +8,7 @@ const transporter = require("../middleware/email");
 var pdf = require("pdf-creator-node");
 const path = require('path');
 var fs = require("fs");
+const settings = require("../models/settings");
 
 exports.addHistory = async (req, res) => {
   const { products, pack, name, method, total, currency, commandNumber } =
@@ -198,6 +199,7 @@ const generatePDF = async (orderData) => {
         return {
           platName: product.plat.name,
           price: product.plat.price,
+          currency: orderData.currency,
           addons: product.addons.map((addon) => ({
             name: addon.name,
             count: addon.count,
@@ -232,7 +234,18 @@ const generatePDF = async (orderData) => {
 exports.addEmail = async (req, res) => {
   const { email, commandNumber } = req.body;
   try {
-    const history = await History.findOne({ commandNumber });
+    const history = await History.findOne({ commandNumber }).sort({ boughtAt: -1 });
+    if (!history) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const settings = await settings.findOne();
+    const orderDate = new Date(history.boughtAt).setHours(0, 0, 0, 0);
+    const today = new Date().setHours(0, 0, 0, 0);
+    if (orderDate < today) {
+      return res.status(400).json({ 
+        message: "Cannot send email for orders from previous days" 
+      });
+    }
     const pdfPath = await generatePDF(history);
     const mailOptions = {
       from: "khaledbouajila5481@gmail.com",
@@ -246,6 +259,7 @@ exports.addEmail = async (req, res) => {
       }],
       context: {
         commandNumber: commandNumber,
+        logo: settings.logo,
         name: history.name,
         boughtAt: history.boughtAt.toLocaleDateString('fr-FR', {
           year: 'numeric',
@@ -258,6 +272,7 @@ exports.addEmail = async (req, res) => {
           return {
             platName: product.plat.name,
             price: product.plat.price,
+            currency: history.currency,
             addons: product.addons.map((addon) => {
               return {
                 name: addon.name,
