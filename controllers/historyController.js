@@ -209,6 +209,13 @@ exports.addEmail = async (req, res) => {
       context: {
         commandNumber: commandNumber,
         name: history.name,
+        boughtAt: history.boughtAt.toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
         products: history.product.map((product) => {
           return {
             platName: product.plat.name,
@@ -233,6 +240,8 @@ exports.addEmail = async (req, res) => {
           };
         }),
         total: history.total,
+        pack: history.pack,
+        method: history.method,
       },
     };
     await transporter.sendMail(mailOptions);
