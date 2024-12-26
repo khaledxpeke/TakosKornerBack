@@ -1,5 +1,5 @@
 const Product = require("../models/product");
-const Rule = require("../models/rules");
+// const Rule = require("../models/rules");
 const Category = require("../models/category");
 const Ingrediant = require("../models/ingrediant");
 const express = require("express");
@@ -17,14 +17,14 @@ exports.addProductToCategory = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
     if (!req.file) {
       return res.status(400).json({
         message: "Ajouter une image",
-        error: "Please upload an image",
+        error: "Veuillez télécharger une image",
       });
     }
 
@@ -113,12 +113,12 @@ exports.addProductToCategory = async (req, res, next) => {
         res.status(201).json({
           product: savedProduct,
           category: updatedCategory,
-          message: "Product ajouté avec succées",
+          message: "Produit ajouté avec succées",
         });
       }
     } catch (error) {
       res.status(400).json({
-        message: "Some error occured",
+        message: "Une erreur s'est produite",
         error: error.message,
       });
     }
@@ -134,7 +134,7 @@ exports.getProductsByCategory = async (req, res, next) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({
-      message: "Some error occured",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -159,7 +159,7 @@ exports.getAllProducts = async (req, res, next) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(400).json({
-      message: "Some error occured",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -193,7 +193,7 @@ exports.deleteProduct = async (req, res, next) => {
     res.status(200).json({ message: "Product supprimer avec succées" });
   } catch (error) {
     res.status(400).json({
-      message: "Some error occured",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -213,14 +213,14 @@ exports.updateProduct = async (req, res) => {
       ingrediants,
       category,
       choice,
-      rules,
+      // rules,
       type,
     } = req.body;
 
     try {
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(404).json({ message: "Produit non trouvé" });
       }
 
       if (req.file) {
@@ -245,48 +245,48 @@ exports.updateProduct = async (req, res) => {
       product.ingrediants = ingrediants ? ingrediants.split(",") : [];
       product.type = type ? type.split(",") : [];
 
-      if (rules) {
-        const updatedRules = await Promise.all(
-          rules.map(async (rule) => {
-            if (rule._id) {
-              return {
-                _id: rule._id,
-                type: rule.type,
-                free: rule.free || 1,
-                quantity: rule.quantity || 1,
-              };
-            } else {
-              const newRule = new Rule(rule);
-              const returnedRule = await newRule.save();
-              return await returnedRule;
-            }
-          })
-        );
-        const removedRuleIds = product.rules.filter(
-          (existingRuleId) =>
-            !updatedRules.some(
-              (updatedRule) =>
-                updatedRule._id.toString() === existingRuleId.toString()
-            )
-        );
+      // if (rules) {
+      //   const updatedRules = await Promise.all(
+      //     rules.map(async (rule) => {
+      //       if (rule._id) {
+      //         return {
+      //           _id: rule._id,
+      //           type: rule.type,
+      //           free: rule.free || 1,
+      //           quantity: rule.quantity || 1,
+      //         };
+      //       } else {
+      //         const newRule = new Rule(rule);
+      //         const returnedRule = await newRule.save();
+      //         return await returnedRule;
+      //       }
+      //     })
+      //   );
+      //   const removedRuleIds = product.rules.filter(
+      //     (existingRuleId) =>
+      //       !updatedRules.some(
+      //         (updatedRule) =>
+      //           updatedRule._id.toString() === existingRuleId.toString()
+      //       )
+      //   );
 
-        await Rule.deleteMany({ _id: { $in: removedRuleIds } });
-        product.rules = updatedRules.map((rule) => rule._id);
-        await Promise.all(
-          updatedRules.map(async (rule) => {
-            await Rule.findByIdAndUpdate(rule._id, rule);
-          })
-        );
-      }
+      //   await Rule.deleteMany({ _id: { $in: removedRuleIds } });
+      //   product.rules = updatedRules.map((rule) => rule._id);
+      //   await Promise.all(
+      //     updatedRules.map(async (rule) => {
+      //       await Rule.findByIdAndUpdate(rule._id, rule);
+      //     })
+      //   );
+      // }
 
       const updatedProduct = await product.save();
 
       res
         .status(200)
-        .json({ updatedProduct, message: "Product updated successfully" });
+        .json({ updatedProduct, message: "Produit mis à jour avec succès" });
     } catch (error) {
       console.log(error);
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: "Erreur de serveur" });
     }
   });
 };

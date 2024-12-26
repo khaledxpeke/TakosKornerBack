@@ -15,12 +15,12 @@ exports.addExtra = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
 
-    const { name, price } = req.body;
+    const { name, price,outOfStock,visible } = req.body;
     const userId = req.user.user._id;
     const image = `uploads\\${req.file?.filename}`|| ""; 
     try {
@@ -28,13 +28,15 @@ exports.addExtra = async (req, res, next) => {
         name,
         image,
         price,
+        outOfStock,
+        visible,
         createdBy: userId,
       });
       await extra.save();
       res.status(201).json({ extra, message: "extra créer avec succées" });
     } catch (error) {
       res.status(400).json({
-        message: "Some error occured",
+        message: "Une erreur s'est produite",
         error: error.message,
       });
     }
@@ -69,10 +71,10 @@ exports.getExtraById = async (req, res, next) => {
 exports.updateExtra = async (req, res) => {
   const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price } = req.body;
+    const { name, price ,outOfStock,visible} = req.body;
     if (err) {
       console.log(err);
-      return res.status(500).json({ message: "Server error" });
+      return res.status(500).json({ message: "Probleme image" });
     }
     const extra = await Extra.findById(extraId);
     if (!extra) {
@@ -90,6 +92,8 @@ exports.updateExtra = async (req, res) => {
         name: name || extra.name,
         price: price || extra.price,
         image: extra.image,
+        outOfStock: outOfStock || extra.outOfStock,
+        visible: visible || extra.visible,
       });
 
       res.status(200).json({ message: "Extra modifiéer avec succées" });
@@ -123,7 +127,7 @@ exports.deleteExtra = async (req, res, next) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: "Some error occured",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }

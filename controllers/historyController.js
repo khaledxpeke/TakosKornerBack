@@ -15,8 +15,11 @@ exports.addHistory = async (req, res) => {
     req.body;
   try {
     const settings = await Settings.findOne();
+    const methodExists = settings.method.find(m => m._id.toString() === method);
+    if (!methodExists || !methodExists.isActive) {
+      return res.status(404).json({ message: 'Mode de paiement non trouvé' });
+    }
     const tva = settings?.tva || 0;
-    const totalWithTVA = total * (1 + tva/100);
     const history = await new History({
       product: products.map((product) => {
         const uniqueAddons = Object.values(
@@ -76,9 +79,11 @@ exports.addHistory = async (req, res) => {
       tva,
       logo: settings.logo,
       // email,
-      method,
-      total,
-      totalWithTVA,
+      method: {
+        _id: methodExists._id,
+        label: methodExists.label
+      },
+      total:total.toFixed(2),
       commandNumber: parseInt(commandNumber, 10),
     });
     // const mailOptions = {
@@ -124,15 +129,15 @@ exports.addHistory = async (req, res) => {
       })
 
       .catch((err) => {
-        console.log("Error occurred while saving history:", err);
+        console.log("Une erreur s'est produite lors de l'enregistrement de l'historique:", err);
         res.status(500).json({
-          message: "Some error occured",
+          message: "Une erreur s'est produite",
           error: err,
         });
       });
   } catch (error) {
     console.error("Error saving history:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };
 
@@ -166,10 +171,9 @@ exports.getLast10Orders = async (req, res) => {
 };
 
 const generatePDF = async (orderData) => {
-  const html = fs.readFileSync(path.join(__dirname, '../template/index.handlebars'), 'utf8');
+  const html = fs.readFileSync(path.join(__dirname, '../template/pdf.handlebars'), 'utf8');
   const settings = await Settings.findOne();
     const tva = settings?.tva || 0;
-    const totalWithTVA = orderData.total * (1 + tva/100);
     const tvaAmount = orderData.total * (tva/100);
     const logoUrl = `${process.env.BASE_URL}/api/${settings.logo.replace(/\\/g, '/')}`;
   const options = {
@@ -225,13 +229,12 @@ const generatePDF = async (orderData) => {
           })),
         };
       }),
-      total: orderData.total,
-      totalWithTVA: totalWithTVA.toFixed(2),
+      total: orderData.total.toFixed(2),
       tvaAmount: tvaAmount.toFixed(2),
       tva: tva,
       logo: logoUrl,
       pack: orderData.pack,
-      method: orderData.method,
+      method: orderData.method.label,
       currency: orderData.currency
     },
     path: `./uploads/order-${orderData.commandNumber}.pdf`
@@ -241,7 +244,7 @@ const generatePDF = async (orderData) => {
     await pdf.create(document, options);
     return document.path;
   } catch (error) {
-    console.error('PDF Generation Error:', error);
+    console.error('Erreur de génération de PDF:', error);
     throw error;
   }
 };
@@ -251,21 +254,19 @@ exports.addEmail = async (req, res) => {
   try {
     const history = await History.findOne({ commandNumber }).sort({ boughtAt: -1 });
     if (!history) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: "Ordre non trouvée" });
     }
     const settings = await Settings.findOne();
     const tva = settings?.tva || 0;
-    const totalWithTVA = history.total * (1 + tva/100);
     const tvaAmount = history.total * (tva/100);
     const orderDate = new Date(history.boughtAt).setHours(0, 0, 0, 0);
     const today = new Date().setHours(0, 0, 0, 0);
     if (orderDate < today) {
       return res.status(400).json({ 
-        message: "Cannot send email for orders from previous days" 
+        message: "Impossible d'envoyer un e-mail pour les commandes des jours précédents" 
       });
     }
     const logoUrl = `${process.env.BASE_URL}/api/${settings.logo.replace(/\\/g, '/')}`;
-    console.log(logoUrl);
     const pdfPath = await generatePDF(history);
     const mailOptions = {
       from: "khaledbouajila5481@gmail.com",
@@ -313,21 +314,20 @@ exports.addEmail = async (req, res) => {
             }),
           };
         }),
-        total: history.total,
-        totalWithTVA: totalWithTVA.toFixed(2),
+        total: history.total.toFixed(2),
         tvaAmount: tvaAmount.toFixed(2),
         tva: tva,
         pack: history.pack,
-        method: history.method,
+        method: history.method.label,
         currency: history.currency,
       },
     };
     await transporter.sendMail(mailOptions);
     fs.unlinkSync(pdfPath);
-    res.status(200).json({ message: "Email sent successfully" });
+    res.status(200).json({ message: "E-mail envoyé avec succès" });
   } catch (error) {
     console.error("Error saving history:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };
 
@@ -355,6 +355,6 @@ exports.getCommandNumber = async (req, res) => {
     res.status(200).json(lastCommandNumber);
   } catch (error) {
     console.error("Error getting command number:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };

@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
-
+const methodSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}, { _id: true });
 const settingsSchema = new mongoose.Schema({
   currencies: {
     type: [String],
@@ -32,6 +41,10 @@ const settingsSchema = new mongoose.Schema({
     type: String,
     default: "uploads/default-banner.png"
   },
+  address: {
+    type: String,
+  },
+  method: [methodSchema],
 });
 
 module.exports = mongoose.model("Settings", settingsSchema);

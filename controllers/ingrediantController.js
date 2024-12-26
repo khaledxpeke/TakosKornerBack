@@ -18,18 +18,18 @@ exports.createIngredient = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
     if (!req.file) {
       return res.status(400).json({
         message: "Ajouter une image",
-        error: "Please upload an image",
+        error: "Veuillez télécharger une image",
       });
     }
 
-    const { name, typeIds,price ,outOfStock, suppPrice} = req.body;
+    const { name, typeIds,price ,outOfStock,visible, suppPrice} = req.body;
     const userId = req.user.user._id;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
@@ -50,6 +50,7 @@ exports.createIngredient = async (req, res, next) => {
         image,
         types: typesArray,
         outOfStock,
+        visible,
         suppPrice,
         createdBy: userId,
       });
@@ -62,7 +63,7 @@ exports.createIngredient = async (req, res, next) => {
         .json({ ingredient, message: "ingrediant créer avec succées" });
     } catch (error) {
       res.status(400).json({
-        message: "Some error occured",
+        message: "Une erreur s'est produite",
         error: error.message,
       });
     }
@@ -106,7 +107,7 @@ exports.addIngrediantToProduct = async (req, res, next) => {
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({
-      message: "Some error occurred while adding ingrediant to product",
+      message: "Une erreur s'est produite lors de l'ajout de l'ingrédient au produit",
       error: error.message,
     });
   }
@@ -137,7 +138,7 @@ exports.getIngredientsByType = async (req, res, next) => {
     res.status(200).json(ingrediants);
   } catch (error) {
     res.status(500).json({
-      message: "Some error occured",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -186,7 +187,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, types,price,outOfStock,suppPrice} = req.body;
+    const { name, types,price,outOfStock,visible,suppPrice} = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -207,6 +208,7 @@ exports.updateIngrediant = async (req, res) => {
       ingrediant.name = name || ingrediant.name;
       ingrediant.types = types || ingrediant.types;
       ingrediant.outOfStock = outOfStock || ingrediant.outOfStock;
+      ingrediant.visible = visible || ingrediant.visible;
       ingrediant.suppPrice = suppPrice || ingrediant.suppPrice;
       if (price !== undefined) {
         ingrediant.price = price !== "" ? price : null;
@@ -274,7 +276,7 @@ exports.deleteIngredient = async (req, res, next) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Some error occurred",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }

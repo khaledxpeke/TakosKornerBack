@@ -37,8 +37,14 @@ const historySchema = mongoose.Schema({
   },
   currency: { type: String },
   method: {
-    type: String,
-    required: true,
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    }
   },
   name: {
     type: String,

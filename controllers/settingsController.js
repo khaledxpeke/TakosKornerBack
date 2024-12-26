@@ -7,18 +7,19 @@ const multer = require("multer");
 const multipleUpload = require("../middleware/multipleUpload");
 const fs = require("fs");
 const path = require("path");
+const { default: mongoose } = require("mongoose");
 
 exports.addSettings = async (req, res) => {
   try {
     const { currency } = req.body;
     if (!currency) {
-      return res.status(400).json({ message: "Currency is required" });
+      return res.status(400).json({ message: "La devise est requise" });
     }
 
     const existing = await Settings.findOne();
     if (existing) {
       if (existing.currencies.includes(currency.toUpperCase())) {
-        return res.status(400).json({ message: "Currency already exists" });
+        return res.status(400).json({ message: "La devise existe déjà" });
       }
 
       existing.currencies.push(currency.toUpperCase());
@@ -27,7 +28,7 @@ exports.addSettings = async (req, res) => {
       return res.status(200).json(existing);
     } else {
       if (currency === undefined) {
-        return res.status(400).json({ message: "Currency is required" });
+        return res.status(400).json({ message: "La devise est requise" });
       }
       const newSettings = new Settings({
         currencies: [currency.toUpperCase()],
@@ -45,7 +46,7 @@ exports.getSettings = async (req, res) => {
   try {
     const settings = await Settings.findOne();
     if (!settings) {
-      return res.status(404).json({ message: "No settings found" });
+      return res.status(404).json({ message: "Aucun paramètre trouvée" });
     }
 
     res.status(200).json(settings);
@@ -58,7 +59,7 @@ exports.getAllCurrencies = async (req, res) => {
   try {
     const currencies = await Settings.findOne();
     if (!currencies) {
-      return res.status(404).json({ message: "No currencies found" });
+      return res.status(404).json({ message: "Aucune devise trouvée" });
     }
 
     res.status(200).json({
@@ -74,7 +75,7 @@ exports.updateDefaultCurrency = async (req, res) => {
   try {
     const { defaultCurrency } = req.body;
     if (!defaultCurrency) {
-      return res.status(400).json({ message: "Default currency is required" });
+      return res.status(400).json({ message: "La devise par défaut est requise" });
     }
 
     const currencyDoc = await Settings.findOne();
@@ -82,14 +83,14 @@ exports.updateDefaultCurrency = async (req, res) => {
       !currencyDoc ||
       !currencyDoc.currencies.includes(defaultCurrency.toUpperCase())
     ) {
-      return res.status(400).json({ message: "Invalid currency" });
+      return res.status(400).json({ message: "Devise invalide" });
     }
 
     currencyDoc.defaultCurrency = defaultCurrency.toUpperCase();
     await currencyDoc.save();
 
     res.status(200).json({
-      message: "Default currency updated",
+      message: "Devise par défaut mise à jour",
       defaultCurrency: currencyDoc.defaultCurrency,
     });
   } catch (error) {
@@ -101,7 +102,7 @@ exports.deleteCurrency = async (req, res) => {
   try {
     const { currency } = req.body;
     if (!currency) {
-      return res.status(400).json({ message: "Currency is required" });
+      return res.status(400).json({ message: "La devise est requise" });
     }
 
     const currencyDoc = await Settings.findOne();
@@ -109,7 +110,7 @@ exports.deleteCurrency = async (req, res) => {
       !currencyDoc ||
       !currencyDoc.currencies.includes(currency.toUpperCase())
     ) {
-      return res.status(400).json({ message: "Currency not found" });
+      return res.status(400).json({ message: "Devise non trouvée" });
     }
 
     currencyDoc.currencies = currencyDoc.currencies.filter(
@@ -121,7 +122,7 @@ exports.deleteCurrency = async (req, res) => {
 
     await currencyDoc.save();
     res.status(200).json({
-      message: "Currency deleted",
+      message: "Devise supprimée avec succès",
       currencies: currencyDoc.currencies,
       defaultCurrency: currencyDoc.defaultCurrency,
     });
@@ -192,18 +193,18 @@ exports.updateSettings = async (req, res) => {
   multipleUpload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
 
     try {
-      const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink } =
+      const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink,method,address } =
         req.body;
       const settings = await Settings.findOne();
 
       if (!settings) {
-        return res.status(404).json({ message: "Settings not found" });
+        return res.status(404).json({ message: "Paramètres non trouvés" });
       }
 
       if (oldCurrency && newCurrency) {
@@ -211,12 +212,12 @@ exports.updateSettings = async (req, res) => {
         const newCurrencyUpper = newCurrency.toUpperCase();
 
         if (!settings.currencies.includes(oldCurrencyUpper)) {
-          return res.status(400).json({ message: "Old currency not found" });
+          return res.status(400).json({ message: "Ancienne devise non trouvée" });
         }
         if (settings.currencies.includes(newCurrencyUpper)) {
           return res
             .status(400)
-            .json({ message: "New currency already exists" });
+            .json({ message: "Une nouvelle devise existe déjà" });
         }
 
         settings.currencies = settings.currencies.map((c) =>
@@ -229,12 +230,31 @@ exports.updateSettings = async (req, res) => {
 
       if (tva !== undefined) {
         if (tva < 0) {
-          return res.status(400).json({ message: "TVA must be positive" });
+          return res.status(400).json({ message: "La TVA doit être positive" });
         }
         settings.tva = tva;
         settings.maxExtras = maxExtras || settings.maxExtras;
         settings.maxDessert = maxDessert || settings.maxDessert;
         settings.maxDrink = maxDrink || settings.maxDrink;
+      }
+
+      if (method) {
+        const parsedMethods = JSON.parse(method);
+        settings.method = parsedMethods.map(updatedMethod => {
+          const existingMethod = settings.method.find(m => m._id.toString() === updatedMethod._id);
+          if (existingMethod) {
+            return {
+              _id: existingMethod._id,
+              label: updatedMethod.label,
+              isActive: updatedMethod.isActive !== undefined ? updatedMethod.isActive : existingMethod.isActive
+            };
+          }
+          return {
+            _id: new mongoose.Types.ObjectId(),
+            label: updatedMethod.label,
+            isActive: updatedMethod.isActive !== undefined ? updatedMethod.isActive : true
+          };
+        });
       }
 
       // Handle logo upload
@@ -260,10 +280,10 @@ exports.updateSettings = async (req, res) => {
         }
         settings.banner = banner;
       }
-
+      settings.address = address || settings.address;
       await settings.save();
       res.status(200).json({
-        message: "Settings updated successfully",
+        message: "Paramètres mis à jour avec succès",
         settings,
       });
     } catch (error) {

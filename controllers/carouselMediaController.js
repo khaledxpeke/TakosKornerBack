@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     fileFilter: (req, file, cb) => {
       const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4'];
       if (!allowedTypes.includes(file.mimetype)) {
-        return cb(new Error('Invalid file type'), false);
+        return cb(new Error('Type de fichier non valide'), false);
       }
       cb(null, true);
     },
@@ -70,7 +70,7 @@ exports.updateOrder = async (req, res) => {
       CarouselMedia.findByIdAndUpdate(item.id, { order: item.order })
     ));
 
-    res.status(200).json({ message: 'Order updated successfully' });
+    res.status(200).json({ message: 'Ordre mise à jour avec succès' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -90,13 +90,13 @@ exports.deleteMedia = async (req, res) => {
   try {
     const media = await CarouselMedia.findById(req.params.id);
     if (!media) {
-      return res.status(404).json({ message: 'Media not found' });
+      return res.status(404).json({ message: 'Média non trouvé' });
     }
 
     fs.unlinkSync(path.join(__dirname, '..', media.fileUrl));
     await CarouselMedia.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({ message: 'Media deleted successfully' });
+    res.status(200).json({ message: 'Le média a été supprimé avec succès' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -14,32 +14,33 @@ exports.addDrink = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
     if (!req.file) {
       return res.status(400).json({
         message: "Ajouter une image",
-        error: "Please upload an image",
+        error: "Veuillez télécharger une image",
       });
     }
 
-    const { name, price,max } = req.body;
+    const { name, price,outOfStock,visible } = req.body;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
       const drinks = await Drink.create({
         name,
         price,
         image,
-        max,
+        outOfStock,
+        visible,
       });
       res.status(201).json({
         drinks,message:"Boissons créer avec succées"
       });
     } catch (error) {
       res.status(400).json({
-        message: "Some error occured",
+        message: "Une erreur s'est produite",
         error: error.message,
       });
     }
@@ -101,10 +102,10 @@ exports.deleteDrink = async (req, res, next) => {
 exports.updateDrink = async (req, res) => {
   const drinkId = req.params.drinkId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,max } = req.body;
+    const { name,price,outOfStock,visible } = req.body;
     if (err) {
       console.log(err);
-      return res.status(500).json({ message: "Server error" });
+      return res.status(500).json({ message: "Probleme image" });
     }
     const drink = await Drink.findById(drinkId);
     if (!drink) {
@@ -121,8 +122,9 @@ exports.updateDrink = async (req, res) => {
       const updatedDrink = await Drink.findByIdAndUpdate(drinkId, {
         name: name || drink.name,
         price: price || drink.price,
-        max: max || drink.max,
         image: drink.image, 
+        outOfStock: outOfStock || drink.outOfStock,
+        visible: visible || drink.visible,
       });
 
       res

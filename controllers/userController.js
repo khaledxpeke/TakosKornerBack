@@ -11,7 +11,7 @@ exports.register = async (req, res, next) => {
   const { email, password, fullName } = req.body;
   const user = await User.findOne({ email });
   if (user) {
-    return res.status(400).json({ message: "User already exists" });
+    return res.status(400).json({ message: "L'utilisateur existe déjà" });
   }
   // const { country: phoneCountryCode, phoneNumber: formattedPhone } = phone(rawPhone);
   // if (!formattedPhone) {
@@ -40,14 +40,14 @@ exports.register = async (req, res, next) => {
         })
         .catch((error) =>
           res.status(400).json({
-            message: "This name already exists",
+            message: "Ce nom existe déjà",
             error: error.message,
           })
         );
     });
   } catch {
     res.status(400).json({
-      message: "An error occurred",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -57,15 +57,15 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({
-      message: "The email or password is incorrect!",
+      message: "L'email ou le mot de passe est incorrect !",
     });
   }
   try {
     const user = await User.findOne({ email });
     if (!user) {
       res.status(401).json({
-        message: "User not found",
-        error: "User not found",
+        message: "Utilisateur non trouvé",
+        error: "Utilisateur non trouvé",
       });
     } else {
       bcrypt.compare(password, user.password).then(function (result) {
@@ -87,13 +87,13 @@ exports.login = async (req, res, next) => {
         } else {
           res
             .status(400)
-            .json({ message: "The email or password is incorrect!" });
+            .json({ message: "L'email ou le mot de passe est incorrect !" });
         }
       });
     }
   } catch (error) {
     res.status(400).json({
-      message: "An error occurred",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -106,7 +106,7 @@ exports.getUsers = async (req, res, next) => {
     res.status(200).json({ users });
   } catch (error) {
     res.status(400).json({
-      message: "An error occurred",
+      message: "Une erreur s'est produite",
       error: error.message,
     });
   }
@@ -115,7 +115,7 @@ exports.getUsers = async (req, res, next) => {
 exports.getUserbyId = async (req, res, next) => {
   const userId = req.user.user._id;
   if (!userId) {
-    res.status(400).json({ message: " Id not present" });
+    res.status(400).json({ message: " Id non trouvée" });
   } else {
     const user = await User.findById(userId);
     res.status(200).json({ user: user });

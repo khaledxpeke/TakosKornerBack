@@ -14,6 +14,14 @@ const extraSchema = mongoose.Schema({
   price: {
     type: Number,
   },
+  outOfStock: {
+    type: Boolean,
+    default: false,
+  },
+  visible: {
+    type: Boolean,
+    default: true,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

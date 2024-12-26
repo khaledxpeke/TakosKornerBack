@@ -8,9 +8,9 @@ const typeSchema = mongoose.Schema({
     message: {
       type: String,
     },
-    isRequired: {
-      type: Boolean,
-      default: false,
+    min: {
+      type: Number,
+      default: 0,
     },
     payment: {
       type: Boolean,

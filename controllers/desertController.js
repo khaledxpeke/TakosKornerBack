@@ -14,32 +14,33 @@ exports.addDesert = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
     if (err) {
       return res.status(400).json({
-        message: "Image upload failed",
+        message: "Le téléchargement de l'image a échoué",
         error: err.message,
       });
     }
     if (!req.file) {
       return res.status(400).json({
         message: "Ajouter une image",
-        error: "Please upload an image",
+        error: "Veuillez télécharger une image",
       });
     }
 
-    const { name, price,max } = req.body;
+    const { name, price,outOfStock,visible } = req.body;
     const image = `uploads/${req.file?.filename}`|| ""; ;
     try {
       const deserts = await Desert.create({
         name,
         price,
         image,
-        max,
+        outOfStock,
+        visible,
       });
       res.status(201).json({
         deserts,message:"Dessert créer avec succées"
       });
     } catch (error) {
       res.status(400).json({
-        message: "Some error occured",
+        message: "Une erreur s'est produite",
         error: error.message,
       });
     }
@@ -101,10 +102,10 @@ exports.deleteDesert = async (req, res, next) => {
 exports.updateDesert = async (req, res) => {
   const desertId = req.params.desertId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,max } = req.body;
+    const { name,price,outOfStock,visible} = req.body;
     if (err) {
       console.log(err);
-      return res.status(500).json({ message: "Server error" });
+      return res.status(500).json({ message: "Probleme image" });
     }
     const desert = await Desert.findById(desertId);
     if (!desert) {
@@ -121,8 +122,9 @@ exports.updateDesert = async (req, res) => {
       const updatedDesert = await Desert.findByIdAndUpdate(desertId, {
         name: name || desert.name,
         price: price || desert.price,
-        max: max || desert.max,
         image: desert.image, 
+        outOfStock: outOfStock || desert.outOfStock,
+        visible: visible || desert.visible,
       });
 
       res
