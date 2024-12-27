@@ -83,7 +83,7 @@ exports.addHistory = async (req, res) => {
         _id: methodExists._id,
         label: methodExists.label
       },
-      total:total.toFixed(2),
+      total:total,
       commandNumber: parseInt(commandNumber, 10),
     });
     // const mailOptions = {
