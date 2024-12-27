@@ -62,14 +62,14 @@ exports.addHistory = async (req, res) => {
             name: addon.name,
             pu: addon.price,
             count: addon.count,
-            total: addon.price * addon.count,
+            total: (addon.price * addon.count).toFixed(2),
           })),
           extras: uniqueExtras.map((extra) => ({
             _id: extra._id,
             name: extra.name,
             pu: extra.price,
             count: extra.count,
-            total: extra.price * extra.count,
+            total: (extra.price * extra.count).toFixed(2),
           })),
         };
       }),
