@@ -86,6 +86,23 @@ exports.getAllMedia = async (req, res) => {
   }
 };
 
+exports.getCarouselStream = async (req, res) => {
+  try {
+    const activeMedia = await CarouselMedia.find({ isActive: true })
+      .sort('order')
+      .select('mediaType fileUrl duration');
+      const STATIC_DURATION = 5;
+    res.render('carousel-viewer', {
+      media: activeMedia,
+      mediaDurations: activeMedia.map(() => STATIC_DURATION).join(','),
+      mediaTypes: activeMedia.map(m => m.mediaType),
+      apiUrl: process.env.BASE_URL 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.deleteMedia = async (req, res) => {
   try {
     const media = await CarouselMedia.findById(req.params.id);

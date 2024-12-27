@@ -34,6 +34,8 @@ app.use("/api/settings", require("./routes/settingsRoutes"));
 app.use("/api/carousel", require("./routes/carouselMediaRoutes"));
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.get(userAuth, (req, res) => res.send("User Route"));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: "1" });
   res.redirect("/");
