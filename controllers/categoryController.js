@@ -57,7 +57,7 @@ exports.getAllCategories = async (req, res) => {
         "name price image type choice description category outOfStock visible",
       populate: {
         path: "type",
-        select: "name message min selection payment quantity",
+        select: "name message min selection payment max",
       },
     });
     const populatedCategories = await Promise.all(
@@ -94,7 +94,8 @@ exports.getAllCategories = async (req, res) => {
                         name: ing.name,
                         image: ing.image,
                         price: priceWithTVA,
-                        // outOfStock: ing.outOfStock
+                        outOfStock: ing.outOfStock,
+                        visible: ing.visible
                       };
                     });
                     return typeObj;

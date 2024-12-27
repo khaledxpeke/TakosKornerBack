@@ -11,23 +11,23 @@ const fs = require("fs");
 const path = require("path");
 
 exports.createType = async (req, res, next) => {
-  const { name, message, min, quantity, payment, selection } = req.body;
+  const { name, message, min, max, payment, selection } = req.body;
 
   try {
     const existingType = await Type.findOne({ name });
     if (existingType) {
       return res.status(400).json({ message: "Option existe déja" });
     }
-    if (min > quantity) {
+    if (min > max) {
       return res.status(400).json({ 
-        message: "Le minimum doit être inférieur à la quantité" 
+        message: "Le minimum doit être inférieur à la maximumu" 
       });
     }
     const newType = new Type({
       name,
       message,
       min,
-      quantity,
+      max,
       payment,
       selection,
     });
@@ -69,22 +69,22 @@ exports.getTypeById = async (req, res, next) => {
 exports.updateType = async (req, res, next) => {
   try {
     const { typeId } = req.params;
-    const { name, message, min, quantity, payment, selection } =
+    const { name, message, min, max, payment, selection } =
       req.body;
     const type = await Type.findById(typeId);
     if (!type) {
       res.status(500).json({ message: "aucun option trouvée" });
     }
-    if (min > quantity) {
+    if (min > max) {
       return res.status(400).json({ 
-        message: "Le minimum doit être inférieur à la quantité" 
+        message: "Le minimum doit être inférieur à la maximumu" 
       });
     }
     const updatedType = await Type.findByIdAndUpdate(typeId, {
       name,
       message,
       min,
-      quantity: quantity || type.quantity,
+      max: max || type.max,
       payment: payment || type.payment,
       selection: selection || type.selection,
     });

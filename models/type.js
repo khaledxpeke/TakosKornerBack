@@ -20,7 +20,7 @@ const typeSchema = mongoose.Schema({
       type: Boolean,
       default: false,
     },
-    quantity : {
+    max : {
       type: Number,
       default: 1,
     },
