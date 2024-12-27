@@ -95,7 +95,7 @@ exports.getAllCategories = async (req, res) => {
                         image: ing.image,
                         price: priceWithTVA,
                         outOfStock: ing.outOfStock,
-                        visible: ing.visible
+                        visible: ing.visible,
                       };
                     });
                     return typeObj;
@@ -104,9 +104,12 @@ exports.getAllCategories = async (req, res) => {
                 })
               );
 
-              productObj.type = typesWithIngredients.filter(type => type !== null);
-          return productObj;
-        }));
+              productObj.type = typesWithIngredients.filter(
+                (type) => type !== null
+              );
+              return productObj;
+            })
+        );
 
         return categoryObj;
       })
@@ -144,7 +147,10 @@ exports.updateCategory = async (req, res) => {
     if (req.file) {
       const image = `uploads\\${req.file?.filename}` || "";
       if (category.image) {
-        fs.unlinkSync(category.image);
+        const imagePath = path.join(__dirname, "..", category.image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
       category.image = image;
     }
@@ -172,13 +178,10 @@ exports.deleteCategory = async (req, res) => {
     }
     console.log(category.image);
     if (category.image) {
-      fs.unlink(category.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucun Categorie image trouvée",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, "..", category.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Category.findByIdAndDelete(category);
 

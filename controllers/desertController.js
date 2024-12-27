@@ -8,6 +8,7 @@ app.use(express.json());
 const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
+const path = require("path");
 
 const upload = multer({ storage: multerStorage });
 exports.addDesert = async (req, res, next) => {

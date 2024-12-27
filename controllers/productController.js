@@ -12,6 +12,7 @@ const multerStorage = require("../middleware/multerStorage");
 app.use(express.json());
 const upload = multer({ storage: multerStorage });
 const fs = require("fs");
+const path = require("path");
 
 exports.addProductToCategory = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
