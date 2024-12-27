@@ -75,7 +75,9 @@ exports.updateDefaultCurrency = async (req, res) => {
   try {
     const { defaultCurrency } = req.body;
     if (!defaultCurrency) {
-      return res.status(400).json({ message: "La devise par défaut est requise" });
+      return res
+        .status(400)
+        .json({ message: "La devise par défaut est requise" });
     }
 
     const currencyDoc = await Settings.findOne();
@@ -199,8 +201,16 @@ exports.updateSettings = async (req, res) => {
     }
 
     try {
-      const { oldCurrency, newCurrency, tva, maxExtras, maxDessert, maxDrink,method,address } =
-        req.body;
+      const {
+        oldCurrency,
+        newCurrency,
+        tva,
+        maxExtras,
+        maxDessert,
+        maxDrink,
+        method,
+        address,
+      } = req.body;
       const settings = await Settings.findOne();
 
       if (!settings) {
@@ -212,7 +222,9 @@ exports.updateSettings = async (req, res) => {
         const newCurrencyUpper = newCurrency.toUpperCase();
 
         if (!settings.currencies.includes(oldCurrencyUpper)) {
-          return res.status(400).json({ message: "Ancienne devise non trouvée" });
+          return res
+            .status(400)
+            .json({ message: "Ancienne devise non trouvée" });
         }
         if (settings.currencies.includes(newCurrencyUpper)) {
           return res
@@ -240,19 +252,28 @@ exports.updateSettings = async (req, res) => {
 
       if (method) {
         const parsedMethods = JSON.parse(method);
-        settings.method = parsedMethods.map(updatedMethod => {
-          const existingMethod = settings.method.find(m => m._id.toString() === updatedMethod._id);
+        settings.method = parsedMethods.map((updatedMethod) => {
+          if (updatedMethod._id) {
+          const existingMethod = settings.method.find(
+            (m) => m._id.toString() === updatedMethod._id
+          );
           if (existingMethod) {
             return {
               _id: existingMethod._id,
               label: updatedMethod.label,
-              isActive: updatedMethod.isActive !== undefined ? updatedMethod.isActive : existingMethod.isActive
+              isActive:
+                updatedMethod.isActive !== undefined
+                  ? updatedMethod.isActive
+                  : existingMethod.isActive,
             };
-          }
+          }}
           return {
-            _id: new mongoose.Types.ObjectId(),
+            _id: updatedMethod._id || new mongoose.Types.ObjectId(),
             label: updatedMethod.label,
-            isActive: updatedMethod.isActive !== undefined ? updatedMethod.isActive : true
+            isActive:
+              updatedMethod.isActive !== undefined
+                ? updatedMethod.isActive
+                : true,
           };
         });
       }
@@ -280,7 +301,10 @@ exports.updateSettings = async (req, res) => {
         }
         settings.banner = banner;
       }
-      settings.address = address || settings.address;
+      if (address) {
+        settings.address = address || settings.address;
+      }
+
       await settings.save();
       res.status(200).json({
         message: "Paramètres mis à jour avec succès",

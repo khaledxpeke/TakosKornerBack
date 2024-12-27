@@ -20,9 +20,9 @@ exports.addExtra = async (req, res, next) => {
       });
     }
 
-    const { name, price,outOfStock,visible } = req.body;
+    const { name, price, outOfStock, visible } = req.body;
     const userId = req.user.user._id;
-    const image = `uploads\\${req.file?.filename}`|| ""; 
+    const image = `uploads\\${req.file?.filename}` || "";
     try {
       const extra = await Extra.create({
         name,
@@ -71,7 +71,7 @@ exports.getExtraById = async (req, res, next) => {
 exports.updateExtra = async (req, res) => {
   const extraId = req.params.extraId;
   upload.single("image")(req, res, async (err) => {
-    const { name, price ,outOfStock,visible} = req.body;
+    const { name, price, outOfStock, visible } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Probleme image" });
@@ -81,9 +81,12 @@ exports.updateExtra = async (req, res) => {
       res.status(500).json({ message: "aucun Extra trouvée" });
     }
     if (req.file) {
-      const image = `uploads\\${req.file?.filename}`|| ""; 
+      const image = `uploads\\${req.file?.filename}` || "";
       if (extra.image) {
-        fs.unlinkSync(extra.image);
+        const imagePath = path.join(__dirname, "..", extra.image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
       extra.image = image;
     }
@@ -113,13 +116,10 @@ exports.deleteExtra = async (req, res, next) => {
       });
     }
     if (extra.image) {
-      fs.unlink(extra.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucune extra image trouvé",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, "..", extra.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Extra.findByIdAndDelete(extra);
     res.status(200).json({

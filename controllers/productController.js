@@ -173,13 +173,10 @@ exports.deleteProduct = async (req, res, next) => {
       return res.status(404).json({ message: "Aucun produit trouvé" });
     }
     if (product.image) {
-      fs.unlink(product.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucun produit image trouvé",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, '..', product.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Product.findByIdAndDelete(product);
     await Category.updateMany(
@@ -226,7 +223,10 @@ exports.updateProduct = async (req, res) => {
       if (req.file) {
         const image = `uploads\\${req.file?.filename}`|| ""; 
         if (product.image) {
-          fs.unlinkSync(product.image);
+          const imagePath = path.join(__dirname, '..', product.image);
+                  if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                  }
         }
         product.image = image;
       }

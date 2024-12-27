@@ -25,8 +25,8 @@ exports.addDrink = async (req, res, next) => {
       });
     }
 
-    const { name, price,outOfStock,visible } = req.body;
-    const image = `uploads/${req.file?.filename}`|| ""; ;
+    const { name, price, outOfStock, visible } = req.body;
+    const image = `uploads/${req.file?.filename}` || "";
     try {
       const drinks = await Drink.create({
         name,
@@ -36,7 +36,8 @@ exports.addDrink = async (req, res, next) => {
         visible,
       });
       res.status(201).json({
-        drinks,message:"Boissons créer avec succées"
+        drinks,
+        message: "Boissons créer avec succées",
       });
     } catch (error) {
       res.status(400).json({
@@ -49,7 +50,6 @@ exports.addDrink = async (req, res, next) => {
 
 exports.getAllDrinks = async (req, res, next) => {
   try {
-
     const drinks = await Drink.find();
     res.status(200).json(drinks);
   } catch (error) {
@@ -65,7 +65,7 @@ exports.getDrinkById = async (req, res, next) => {
     const { drinkId } = req.params;
     const drink = await Drink.findById(drinkId);
     res.status(200).json({
-        drink,
+      drink,
     });
   } catch (error) {
     res.status(400).json({
@@ -80,13 +80,10 @@ exports.deleteDrink = async (req, res, next) => {
     const { drinkId } = req.params;
     const drinks = await Drink.findById(drinkId);
     if (drinks.image) {
-      fs.unlink(drinks.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucun boisson image trouvé",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, "..", drinks.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Drink.findByIdAndDelete(drinks);
     res.status(200).json({
@@ -102,7 +99,7 @@ exports.deleteDrink = async (req, res, next) => {
 exports.updateDrink = async (req, res) => {
   const drinkId = req.params.drinkId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,outOfStock,visible } = req.body;
+    const { name, price, outOfStock, visible } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Probleme image" });
@@ -112,9 +109,12 @@ exports.updateDrink = async (req, res) => {
       res.status(500).json({ message: "aucun Boisson trouvée" });
     }
     if (req.file) {
-      const image = `uploads\\${req.file?.filename}`|| ""; 
+      const image = `uploads\\${req.file?.filename}` || "";
       if (drink.image) {
-        fs.unlinkSync(drink.image);
+        const imagePath = path.join(__dirname, "..", drink.image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
       drink.image = image;
     }
@@ -122,14 +122,12 @@ exports.updateDrink = async (req, res) => {
       const updatedDrink = await Drink.findByIdAndUpdate(drinkId, {
         name: name || drink.name,
         price: price || drink.price,
-        image: drink.image, 
+        image: drink.image,
         outOfStock: outOfStock || drink.outOfStock,
         visible: visible || drink.visible,
       });
 
-      res
-        .status(200)
-        .json({ message: "Boisson modifiéer avec succées" });
+      res.status(200).json({ message: "Boisson modifiéer avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

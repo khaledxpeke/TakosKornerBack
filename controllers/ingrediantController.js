@@ -11,6 +11,7 @@ const multer = require("multer");
 const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
 const { default: mongoose } = require("mongoose");
+const path = require("path");
 
 const upload = multer({ storage: multerStorage });
 
@@ -199,7 +200,10 @@ exports.updateIngrediant = async (req, res) => {
     if (req.file) {
       const image = `uploads\\${req.file?.filename}`|| ""; 
       if (ingrediant.image) {
-        fs.unlinkSync(ingrediant.image);
+        const imagePath = path.join(__dirname, '..', ingrediant.image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
       }
       ingrediant.image = image;
     }
@@ -256,13 +260,10 @@ exports.deleteIngredient = async (req, res, next) => {
       });
     }
     if (ingrediant.image) {
-      fs.unlink(ingrediant.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucun ingrediant image trouvé",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, '..', ingrediant.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Ingrediant.deleteOne({ _id: ingrediant._id });
 

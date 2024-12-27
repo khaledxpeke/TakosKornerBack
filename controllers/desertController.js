@@ -25,8 +25,8 @@ exports.addDesert = async (req, res, next) => {
       });
     }
 
-    const { name, price,outOfStock,visible } = req.body;
-    const image = `uploads/${req.file?.filename}`|| ""; ;
+    const { name, price, outOfStock, visible } = req.body;
+    const image = `uploads/${req.file?.filename}` || "";
     try {
       const deserts = await Desert.create({
         name,
@@ -36,7 +36,8 @@ exports.addDesert = async (req, res, next) => {
         visible,
       });
       res.status(201).json({
-        deserts,message:"Dessert créer avec succées"
+        deserts,
+        message: "Dessert créer avec succées",
       });
     } catch (error) {
       res.status(400).json({
@@ -49,7 +50,6 @@ exports.addDesert = async (req, res, next) => {
 
 exports.getAllDeserts = async (req, res, next) => {
   try {
-
     const deserts = await Desert.find();
     res.status(200).json(deserts);
   } catch (error) {
@@ -80,13 +80,10 @@ exports.deleteDesert = async (req, res, next) => {
     const { desertId } = req.params;
     const deserts = await Desert.findById(desertId);
     if (deserts.image) {
-      fs.unlink(deserts.image, (err) => {
-        if (err) {
-          res.status(500).json({
-            message: "Aucun dessert image trouvé",
-          });
-        }
-      });
+      const imagePath = path.join(__dirname, "..", deserts.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
     await Desert.findByIdAndDelete(deserts);
     res.status(200).json({
@@ -102,7 +99,7 @@ exports.deleteDesert = async (req, res, next) => {
 exports.updateDesert = async (req, res) => {
   const desertId = req.params.desertId;
   upload.single("image")(req, res, async (err) => {
-    const { name,price,outOfStock,visible} = req.body;
+    const { name, price, outOfStock, visible } = req.body;
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Probleme image" });
@@ -112,9 +109,12 @@ exports.updateDesert = async (req, res) => {
       res.status(500).json({ message: "aucun Dessert trouvée" });
     }
     if (req.file) {
-      const image = `uploads\\${req.file?.filename}`|| ""; 
+      const image = `uploads\\${req.file?.filename}` || "";
       if (desert.image) {
-        fs.unlinkSync(desert.image);
+        const imagePath = path.join(__dirname, "..", desert.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
       }
       desert.image = image;
     }
@@ -122,14 +122,12 @@ exports.updateDesert = async (req, res) => {
       const updatedDesert = await Desert.findByIdAndUpdate(desertId, {
         name: name || desert.name,
         price: price || desert.price,
-        image: desert.image, 
+        image: desert.image,
         outOfStock: outOfStock || desert.outOfStock,
         visible: visible || desert.visible,
       });
 
-      res
-        .status(200)
-        .json({ message: "Dessert modifiéer avec succées" });
+      res.status(200).json({ message: "Dessert modifiéer avec succées" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

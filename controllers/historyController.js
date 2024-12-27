@@ -174,6 +174,7 @@ const generatePDF = async (orderData) => {
   const html = fs.readFileSync(path.join(__dirname, '../template/pdf.handlebars'), 'utf8');
   const settings = await Settings.findOne();
     const tva = settings?.tva || 0;
+    const address = settings?.address;
     const tvaAmount = orderData.total * (tva/100);
     const logoUrl = `${process.env.BASE_URL}/api/${settings.logo.replace(/\\/g, '/')}`;
   const options = {
@@ -233,6 +234,7 @@ const generatePDF = async (orderData) => {
       tvaAmount: tvaAmount.toFixed(2),
       tva: tva,
       logo: logoUrl,
+      address: address,
       pack: orderData.pack,
       method: orderData.method.label,
       currency: orderData.currency
