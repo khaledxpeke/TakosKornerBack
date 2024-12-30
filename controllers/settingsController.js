@@ -25,7 +25,9 @@ exports.addSettings = async (req, res) => {
       existing.currencies.push(currency.toUpperCase());
 
       await existing.save();
-      return res.status(200).json(existing);
+      return res
+        .status(200)
+        .json({ existing, message: "La devise ajoutée avec succées" });
     } else {
       if (currency === undefined) {
         return res.status(400).json({ message: "La devise est requise" });
@@ -35,7 +37,9 @@ exports.addSettings = async (req, res) => {
         defaultCurrency: currency.toUpperCase(),
       });
       await newSettings.save();
-      return res.status(201).json(newSettings);
+      return res
+        .status(201)
+        .json({ newSettings, message: "La devise ajoutée avec succées" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -226,10 +230,13 @@ exports.updateSettings = async (req, res) => {
             .status(400)
             .json({ message: "Ancienne devise non trouvée" });
         }
-        if (settings.currencies.includes(newCurrencyUpper)) {
+        if (
+          settings.currencies.includes(newCurrencyUpper) &&
+          oldCurrencyUpper !== newCurrencyUpper
+        ) {
           return res
             .status(400)
-            .json({ message: "la nouvelle devise déjà existe" });
+            .json({ message: "la nouvelle devise déjà existe " });
         }
 
         settings.currencies = settings.currencies.map((c) =>
@@ -254,19 +261,20 @@ exports.updateSettings = async (req, res) => {
         const parsedMethods = JSON.parse(method);
         settings.method = parsedMethods.map((updatedMethod) => {
           if (updatedMethod._id) {
-          const existingMethod = settings.method.find(
-            (m) => m._id.toString() === updatedMethod._id
-          );
-          if (existingMethod) {
-            return {
-              _id: existingMethod._id,
-              label: updatedMethod.label,
-              isActive:
-                updatedMethod.isActive !== undefined
-                  ? updatedMethod.isActive
-                  : existingMethod.isActive,
-            };
-          }}
+            const existingMethod = settings.method.find(
+              (m) => m._id.toString() === updatedMethod._id
+            );
+            if (existingMethod) {
+              return {
+                _id: existingMethod._id,
+                label: updatedMethod.label,
+                isActive:
+                  updatedMethod.isActive !== undefined
+                    ? updatedMethod.isActive
+                    : existingMethod.isActive,
+              };
+            }
+          }
           return {
             _id: updatedMethod._id || new mongoose.Types.ObjectId(),
             label: updatedMethod.label,

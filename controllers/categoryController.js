@@ -8,6 +8,7 @@ const multerStorage = require("../middleware/multerStorage");
 const fs = require("fs");
 const Ingrediant = require("../models/ingrediant");
 const Settings = require("../models/settings");
+const path = require("path");
 
 const upload = multer({ storage: multerStorage });
 exports.createCategory = async (req, res) => {
@@ -54,11 +55,18 @@ exports.getAllCategories = async (req, res) => {
     const categories = await Category.find().populate({
       path: "products",
       select:
-        "name price image type choice description category outOfStock visible",
-      populate: {
-        path: "type",
-        select: "name message min selection payment max",
-      },
+        "name price image type choice description category outOfStock variations visible",
+        populate: [
+          {
+            path: "type",
+            select: "name message min selection payment max"
+          },
+          {
+            path: "variations._id",
+            model: 'Variation',
+            select: "name price"
+          }
+        ]
     });
     const populatedCategories = await Promise.all(
       categories.map(async (category) => {
@@ -73,6 +81,11 @@ exports.getAllCategories = async (req, res) => {
                 (productObj.price * (1 + tva / 100)).toFixed(2)
               );
 
+              productObj.variations = productObj.variations.map(v => ({
+                _id: v._id._id,
+                name: v._id.name,
+                price: v.price
+              }));
               const typesWithIngredients = await Promise.all(
                 product.type.map(async (type) => {
                   const typeObj = type.toObject();

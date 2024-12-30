@@ -188,7 +188,8 @@ exports.getProductData = async (req, res) => {
       select: 'name message payment selection max min'
     })
     .populate({
-      path: 'variations',
+      path: 'variations._id',
+      model:'Variation',
       select: 'name price'
     })
     .lean();
@@ -196,6 +197,11 @@ exports.getProductData = async (req, res) => {
   if (!product) {
     return res.status(404).json({ message: "Produit non trouvé" });
   }
+  product.variations = product.variations.map(v => ({
+      _id: v._id._id,
+      name: v._id.name,
+      price: v.price
+    }));
 
   const typesWithIngredients = await Promise.all(
     product.type.map(async (type) => {
