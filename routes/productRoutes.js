@@ -5,11 +5,13 @@ const {
   getProductsByCategory,
   deleteProduct,
   updateProduct,
-  getAllProducts
+  getAllProducts,
+  getProductData
 } = require("../controllers/productController");
 
 router.route("/:categoryId").post(userAuth,addProductToCategory);
 router.route("/:categoryId").get(getProductsByCategory);
+router.route("/:productId/:variationId").get(getProductData);
 router.route("/").get(getAllProducts);
 router.route("/update/:productId").put(userAuth, updateProduct);
 router.route("/:productId").delete(userAuth, deleteProduct);

@@ -229,7 +229,7 @@ exports.updateSettings = async (req, res) => {
         if (settings.currencies.includes(newCurrencyUpper)) {
           return res
             .status(400)
-            .json({ message: "Une nouvelle devise existe déjà" });
+            .json({ message: "la nouvelle devise déjà existe" });
         }
 
         settings.currencies = settings.currencies.map((c) =>

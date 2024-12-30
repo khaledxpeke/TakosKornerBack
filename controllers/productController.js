@@ -13,6 +13,7 @@ app.use(express.json());
 const upload = multer({ storage: multerStorage });
 const fs = require("fs");
 const path = require("path");
+const Settings = require("../models/settings");
 
 exports.addProductToCategory = async (req, res, next) => {
   upload.single("image")(req, res, async (err) => {
@@ -175,6 +176,81 @@ exports.getAllProducts = async (req, res, next) => {
   }
 };
 
+exports.getProductData = async (req, res) => {
+  try {
+    const { productId, variationId } = req.params;
+    const settings = await Settings.findOne();
+    const tva = settings?.tva || 0;
+
+    const product = await Product.findById(productId)
+    .populate({
+      path: 'type',
+      select: 'name message payment selection max min'
+    })
+    .populate({
+      path: 'variations',
+      select: 'name price'
+    })
+    .lean();
+
+  if (!product) {
+    return res.status(404).json({ message: "Produit non trouvé" });
+  }
+
+  const typesWithIngredients = await Promise.all(
+    product.type.map(async (type) => {
+      const typeIngredients = await Ingrediant.find({
+        types: type._id,
+        visible: true
+      })
+      .populate({
+        path: 'variations',
+         model: 'Variation',
+        select: 'name price'
+      })
+      .select('name image price outOfStock visible')
+      .lean();
+
+      if (typeIngredients.length > 0) {
+        return {
+          ...type,
+          ingrediants: typeIngredients.map(ing => {
+            const variation = ing.variations?.find(v => v._id.toString() === variationId);
+            const price = variation ? variation.price : ing.price;
+            const priceWithTVA = Number((price * (1 + tva/100)).toFixed(2));
+
+            return {
+              _id: ing._id,
+              name: ing.name,
+              image: ing.image,
+              price: priceWithTVA,
+              outOfStock: ing.outOfStock,
+              visible: ing.visible
+            };
+          })
+        };
+      }
+      return null;
+    })
+  );
+
+  const selectedVariation = product.variations?.find(v => v._id.toString() === variationId);
+  const productPrice = selectedVariation ? selectedVariation.price : product.price;
+  const finalPrice = Number((productPrice * (1 + tva/100)).toFixed(2));
+
+  res.status(200).json({
+    ...product,
+    price: finalPrice,
+    type: typesWithIngredients.filter(t => t !== null)
+  });
+
+} catch (error) {
+  res.status(500).json({
+    message: "Une erreur s'est produite",
+    error: error.message
+  });
+}
+};
 exports.deleteProduct = async (req, res, next) => {
   const productId = req.params.productId;
   try {
@@ -261,8 +337,9 @@ exports.updateProduct = async (req, res) => {
 
       product.ingrediants = ingrediants ? ingrediants.split(",") : [];
       product.type = type ? type.split(",") : [];
+      if (variations){
       product.variations = variationsArray ? variationsArray.split(",") : product.variations;
-
+    }
       // if (rules) {
       //   const updatedRules = await Promise.all(
       //     rules.map(async (rule) => {
