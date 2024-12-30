@@ -30,9 +30,10 @@ exports.createIngredient = async (req, res, next) => {
       });
     }
 
-    const { name, typeIds,price ,outOfStock,visible, suppPrice} = req.body;
+    const { name, typeIds, price, outOfStock, visible, suppPrice, variations } =
+      req.body;
     const userId = req.user.user._id;
-    const image = `uploads/${req.file?.filename}`|| ""; ;
+    const image = `uploads/${req.file?.filename}` || "";
     try {
       const nameAlreadyExist = await Ingrediant.findOne({ name });
       if (nameAlreadyExist) {
@@ -40,16 +41,22 @@ exports.createIngredient = async (req, res, next) => {
       }
       let typesArray = [];
       if (typeIds) {
-        typesArray = Array.isArray(typeIds)
-          ? typeIds 
-          : JSON.parse(typeIds); 
+        typesArray = Array.isArray(typeIds) ? typeIds : JSON.parse(typeIds);
 
         typesArray = typesArray.map((id) => new mongoose.Types.ObjectId(id));
+      }
+
+      let variationsArray = [];
+      if (variations) {
+        variationsArray = Array.isArray(variations)
+          ? variations
+          : JSON.parse(variations);
       }
       const ingredient = await Ingrediant.create({
         name,
         image,
         types: typesArray,
+        variations: variationsArray || [],
         outOfStock,
         visible,
         suppPrice,
@@ -108,7 +115,8 @@ exports.addIngrediantToProduct = async (req, res, next) => {
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({
-      message: "Une erreur s'est produite lors de l'ajout de l'ingrédient au produit",
+      message:
+        "Une erreur s'est produite lors de l'ajout de l'ingrédient au produit",
       error: error.message,
     });
   }
@@ -162,7 +170,7 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
       "types",
       { name: 1 }
     );
-    
+
     // Group ingredients by type name
     const ingrediantsByType = {};
     ingrediants.forEach((ingrediant) => {
@@ -172,10 +180,14 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
         if (!ingrediantsByType[name]) {
           ingrediantsByType[name] = [];
         }
-        ingrediantsByType[name].push({ _id: ingrediant._id, name: ingrediant.name,type:ingrediant.type });
+        ingrediantsByType[name].push({
+          _id: ingrediant._id,
+          name: ingrediant.name,
+          type: ingrediant.type,
+        });
       }
     });
-    
+
     res.status(200).json(ingrediantsByType);
   } catch (error) {
     res.status(400).json({
@@ -188,7 +200,13 @@ exports.getAllIngrediantsByType = async (req, res, next) => {
 exports.updateIngrediant = async (req, res) => {
   const ingrediantId = req.params.ingrediantId;
   upload.single("image")(req, res, async (err) => {
-    const { name, types,price,outOfStock,visible,suppPrice} = req.body;
+    const { name, types, price, outOfStock, visible, suppPrice ,variations} = req.body;
+    let variationsArray = [];
+    if (variations) {
+      variationsArray = Array.isArray(variations)
+        ? variations
+        : JSON.parse(variations);
+    }
     if (err) {
       console.log(err);
       return res.status(500).json({ message: "Server error" });
@@ -198,9 +216,9 @@ exports.updateIngrediant = async (req, res) => {
       res.status(500).json({ message: "aucun Ingrediant trouvée" });
     }
     if (req.file) {
-      const image = `uploads\\${req.file?.filename}`|| ""; 
+      const image = `uploads\\${req.file?.filename}` || "";
       if (ingrediant.image) {
-        const imagePath = path.join(__dirname, '..', ingrediant.image);
+        const imagePath = path.join(__dirname, "..", ingrediant.image);
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
@@ -208,12 +226,12 @@ exports.updateIngrediant = async (req, res) => {
       ingrediant.image = image;
     }
     try {
-      
       ingrediant.name = name || ingrediant.name;
       ingrediant.types = types || ingrediant.types;
       ingrediant.outOfStock = outOfStock || ingrediant.outOfStock;
       ingrediant.visible = visible || ingrediant.visible;
       ingrediant.suppPrice = suppPrice || ingrediant.suppPrice;
+      ingrediant.variations = variationsArray || ingrediant.variations;
       if (price !== undefined) {
         ingrediant.price = price !== "" ? price : null;
       }
@@ -260,7 +278,7 @@ exports.deleteIngredient = async (req, res, next) => {
       });
     }
     if (ingrediant.image) {
-      const imagePath = path.join(__dirname, '..', ingrediant.image);
+      const imagePath = path.join(__dirname, "..", ingrediant.image);
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }

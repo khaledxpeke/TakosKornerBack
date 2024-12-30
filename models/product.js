@@ -26,12 +26,23 @@ const ProductSchema = new Mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  variations: [
+    {
+      variation: { type: Mongoose.Schema.Types.ObjectId, ref: "Variation" },
+      price: {
+        type: Number,
+        default: 0,
+      },
+    },
+  ],
   // ingrediants: [{ type: Mongoose.Schema.Types.ObjectId, ref: "Ingrediant" }],
-  type : [{
-    type: Mongoose.Schema.Types.ObjectId,
-    ref: "Type",
-    required: true,
-  }],
+  type: [
+    {
+      type: Mongoose.Schema.Types.ObjectId,
+      ref: "Type",
+      required: true,
+    },
+  ],
   createdBy: {
     type: Mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -55,12 +66,11 @@ const ProductSchema = new Mongoose.Schema({
   //   type: Mongoose.Schema.Types.ObjectId,
   //   ref: "Rule",
   // }],
- 
 });
 
 // ProductSchema.pre("save", async function (next) {
 //   try {
-//     const settings = await Settings.findOne(); 
+//     const settings = await Settings.findOne();
 //     if (!settings) {
 //       throw new Error("Settings not configured.");
 //     }

@@ -32,6 +32,7 @@ app.use("/api/extra", require("./routes/extraRoutes"));
 app.use("/api/history", require("./routes/historyRoutes"));
 app.use("/api/drink", require("./routes/drinkRoutes"));
 app.use("/api/settings", require("./routes/settingsRoutes"));
+app.use("/api/variation", require("./routes/variationRoutes"));
 app.use("/api/carousel", require("./routes/carouselMediaRoutes"));
 app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/uploads/carousel', express.static(path.join(__dirname, 'uploads', 'carousel')));

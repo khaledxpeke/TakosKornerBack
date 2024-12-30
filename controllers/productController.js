@@ -33,10 +33,17 @@ exports.addProductToCategory = async (req, res, next) => {
     const userId = req.user.user._id;
     const price = Number(req.body.price ?? "");
     const name = req.body.name.replace(/"/g, "");
-    const image = `uploads/${req.file?.filename}`|| ""; ;
-    const { currency, choice,description,outOfStock,visible } = req.body;
+    const image = `uploads/${req.file?.filename}` || "";
+    const { currency, choice, description, outOfStock, visible, variations } =
+      req.body;
     // const ingrediantIds = req.body.ingrediants?.split(",") || [];
-    const typeIds = req.body.type || []; 
+    const typeIds = req.body.type || [];
+    let variationsArray = [];
+    if (variations) {
+      variationsArray = Array.isArray(variations)
+        ? variations
+        : JSON.parse(variations);
+    }
     // const rules = JSON.parse(req.body.rules) || [];
     // const supplementIds = req.body.supplements?.split(",") || [];
     const rulesIds = [];
@@ -57,6 +64,7 @@ exports.addProductToCategory = async (req, res, next) => {
         //     console.error("Error saving rule:", error);
         //   }
         // }
+        const parsedTypeIds = Array.isArray(typeIds) ? typeIds : JSON.parse(typeIds);
         const product = new Product({
           name,
           description,
@@ -65,7 +73,8 @@ exports.addProductToCategory = async (req, res, next) => {
           outOfStock,
           visible,
           // currency,
-          type: typeIds,
+          type: parsedTypeIds,
+          variations: variationsArray || [],
           // rules: rulesIds,
           createdBy: userId,
           // ingrediants: ingrediantIds,
@@ -174,7 +183,7 @@ exports.deleteProduct = async (req, res, next) => {
       return res.status(404).json({ message: "Aucun produit trouvé" });
     }
     if (product.image) {
-      const imagePath = path.join(__dirname, '..', product.image);
+      const imagePath = path.join(__dirname, "..", product.image);
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }
@@ -213,21 +222,28 @@ exports.updateProduct = async (req, res) => {
       choice,
       // rules,
       type,
+      variations
     } = req.body;
 
     try {
+      let variationsArray = [];
+    if (variations) {
+      variationsArray = Array.isArray(variations)
+        ? variations
+        : JSON.parse(variations);
+    }
       const product = await Product.findById(productId);
       if (!product) {
         return res.status(404).json({ message: "Produit non trouvé" });
       }
 
       if (req.file) {
-        const image = `uploads\\${req.file?.filename}`|| ""; 
+        const image = `uploads\\${req.file?.filename}` || "";
         if (product.image) {
-          const imagePath = path.join(__dirname, '..', product.image);
-                  if (fs.existsSync(imagePath)) {
-                    fs.unlinkSync(imagePath);
-                  }
+          const imagePath = path.join(__dirname, "..", product.image);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
         }
         product.image = image;
       }
@@ -245,6 +261,7 @@ exports.updateProduct = async (req, res) => {
 
       product.ingrediants = ingrediants ? ingrediants.split(",") : [];
       product.type = type ? type.split(",") : [];
+      product.variations = variationsArray ? variationsArray.split(",") : product.variations;
 
       // if (rules) {
       //   const updatedRules = await Promise.all(
