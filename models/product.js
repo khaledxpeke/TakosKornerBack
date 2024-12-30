@@ -28,7 +28,7 @@ const ProductSchema = new Mongoose.Schema({
   },
   variations: [
     {
-      variation: { type: Mongoose.Schema.Types.ObjectId, ref: "Variation" },
+      _id: { type: Mongoose.Schema.Types.ObjectId, ref: "Variation" },
       price: {
         type: Number,
         default: 0,

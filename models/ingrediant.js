@@ -42,7 +42,7 @@ const ingrediantSchema = mongoose.Schema({
   },
  variations: [
      {
-       variation: { type: mongoose.Schema.Types.ObjectId, ref: "Variation" },
+       _id: { type: mongoose.Schema.Types.ObjectId, ref: "Variation" },
        price: {
          type: Number,
          default: 0,

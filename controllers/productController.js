@@ -344,7 +344,7 @@ exports.updateProduct = async (req, res) => {
       product.ingrediants = ingrediants ? ingrediants.split(",") : [];
       product.type = type ? type.split(",") : [];
       if (variations){
-      product.variations = variationsArray ? variationsArray.split(",") : product.variations;
+      product.variations = variationsArray || product.variations;
     }
       // if (rules) {
       //   const updatedRules = await Promise.all(
