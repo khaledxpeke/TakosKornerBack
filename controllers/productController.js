@@ -65,7 +65,9 @@ exports.addProductToCategory = async (req, res, next) => {
         //     console.error("Error saving rule:", error);
         //   }
         // }
-        const parsedTypeIds = Array.isArray(typeIds) ? typeIds : JSON.parse(typeIds);
+        const parsedTypeIds = Array.isArray(typeIds)
+          ? typeIds
+          : JSON.parse(typeIds);
         const product = new Product({
           name,
           description,
@@ -140,7 +142,10 @@ exports.getProductsByCategory = async (req, res, next) => {
   const { categoryId } = req.params;
 
   try {
-    const products = await Product.find({ category: categoryId });
+    const products = await Product.find({ category: categoryId }).populate({
+      path: "type",
+      select: "name",
+    });
 
     res.status(200).json(products);
   } catch (error) {
@@ -183,79 +188,84 @@ exports.getProductData = async (req, res) => {
     const tva = settings?.tva || 0;
 
     const product = await Product.findById(productId)
-    .populate({
-      path: 'type',
-      select: 'name message payment selection max min'
-    })
-    .populate({
-      path: 'variations._id',
-      model:'Variation',
-      select: 'name price'
-    })
-    .lean();
-
-  if (!product) {
-    return res.status(404).json({ message: "Produit non trouvé" });
-  }
-  product.variations = product.variations.map(v => ({
-      _id: v._id._id,
-      name: v._id.name,
-      price: v.price
-    }));
-
-  const typesWithIngredients = await Promise.all(
-    product.type.map(async (type) => {
-      const typeIngredients = await Ingrediant.find({
-        types: type._id,
-        visible: true
+      .populate({
+        path: "type",
+        select: "name message payment selection max min",
       })
       .populate({
-        path: 'variations',
-         model: 'Variation',
-        select: 'name price'
+        path: "variations._id",
+        model: "Variation",
+        select: "name price",
       })
-      .select('name image price outOfStock visible')
       .lean();
 
-      if (typeIngredients.length > 0) {
-        return {
-          ...type,
-          ingrediants: typeIngredients.map(ing => {
-            const variation = ing.variations?.find(v => v._id.toString() === variationId);
-            const price = variation ? variation.price : ing.price;
-            const priceWithTVA = Number((price * (1 + tva/100)).toFixed(2));
+    if (!product) {
+      return res.status(404).json({ message: "Produit non trouvé" });
+    }
+    product.variations = product.variations.map((v) => ({
+      _id: v._id._id,
+      name: v._id.name,
+      price: v.price,
+    }));
 
-            return {
-              _id: ing._id,
-              name: ing.name,
-              image: ing.image,
-              price: priceWithTVA,
-              outOfStock: ing.outOfStock,
-              visible: ing.visible
-            };
+    const typesWithIngredients = await Promise.all(
+      product.type.map(async (type) => {
+        const typeIngredients = await Ingrediant.find({
+          types: type._id,
+          visible: true,
+        })
+          .populate({
+            path: "variations",
+            model: "Variation",
+            select: "name price",
           })
-        };
-      }
-      return null;
-    })
-  );
+          .select("name image price outOfStock visible")
+          .lean();
 
-  const selectedVariation = product.variations?.find(v => v._id.toString() === variationId);
-  const productPrice = selectedVariation ? selectedVariation.price : product.price;
-  const finalPrice = Number((productPrice * (1 + tva/100)).toFixed(2));
+        if (typeIngredients.length > 0) {
+          return {
+            ...type,
+            ingrediants: typeIngredients.map((ing) => {
+              const variation = ing.variations?.find(
+                (v) => v._id.toString() === variationId
+              );
+              const price = variation ? variation.price : ing.price;
+              const priceWithTVA = Number((price * (1 + tva / 100)).toFixed(2));
 
-  res.status(200).json({
-    ...product,
-    price: finalPrice,
-    type: typesWithIngredients.filter(t => t !== null)
-  });
+              return {
+                _id: ing._id,
+                name: ing.name,
+                image: ing.image,
+                price: priceWithTVA,
+                outOfStock: ing.outOfStock,
+                visible: ing.visible,
+              };
+            }),
+          };
+        }
+        return null;
+      })
+    );
 
-} catch (error) {
-  res.status(500).json({
-    message: "Une erreur s'est produite",
-    error: error.message
-  });
-}
+    const selectedVariation = product.variations?.find(
+      (v) => v._id.toString() === variationId
+    );
+    const productPrice = selectedVariation
+      ? selectedVariation.price
+      : product.price;
+    const finalPrice = Number((productPrice * (1 + tva / 100)).toFixed(2));
+
+    res.status(200).json({
+      ...product,
+      price: finalPrice,
+      type: typesWithIngredients.filter((t) => t !== null),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Une erreur s'est produite",
+      error: error.message,
+    });
+  }
 };
 exports.deleteProduct = async (req, res, next) => {
   const productId = req.params.productId;
@@ -304,16 +314,16 @@ exports.updateProduct = async (req, res) => {
       choice,
       // rules,
       type,
-      variations
+      variations,
     } = req.body;
 
     try {
       let variationsArray = [];
-    if (variations) {
-      variationsArray = Array.isArray(variations)
-        ? variations
-        : JSON.parse(variations);
-    }
+      if (variations) {
+        variationsArray = Array.isArray(variations)
+          ? variations
+          : JSON.parse(variations);
+      }
       const product = await Product.findById(productId);
       if (!product) {
         return res.status(404).json({ message: "Produit non trouvé" });
@@ -343,9 +353,9 @@ exports.updateProduct = async (req, res) => {
 
       product.ingrediants = ingrediants ? ingrediants.split(",") : [];
       product.type = type ? type.split(",") : [];
-      if (variations){
-      product.variations = variationsArray || product.variations;
-    }
+      if (variations) {
+        product.variations = variationsArray || product.variations;
+      }
       // if (rules) {
       //   const updatedRules = await Promise.all(
       //     rules.map(async (rule) => {
